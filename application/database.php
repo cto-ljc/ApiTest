@@ -13,13 +13,13 @@ return [
     // 数据库类型
     'type'           => 'mysql',
     // 服务器地址
-    'hostname'       => '119.23.34.123',
+    'hostname'       => '127.0.0.1',
     // 数据库名
     'database'       => 'api_test_development',
     // 用户名
     'username'       => 'api_test',
     // 密码
-    'password'       => 'qwerty',
+    'password'       => 'cto-ljc@qq.com',
     // 端口
     'hostport'       => '3306',
     // 连接dsn
