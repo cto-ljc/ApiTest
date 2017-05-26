@@ -1,0 +1,165 @@
+<style>
+.app{  }
+.right{ float: right; margin-left: 10px; }
+.xblock{ height: 38px;}
+.api-nav{ background-color: #000; }
+.layui-table th.handle,.handle{width:100px; float:right; text-align: right;}
+.layui-tab-content .layui-tab-item .nav{    height: 30px;  line-height: 30px;  padding-right:5px;  }
+</style>
+<div class="x-nav">
+    <span class="layui-breadcrumb">
+      <a><cite>首页</cite></a>
+      <a><cite>项目管理</cite></a>
+      <a><cite>api管理</cite></a>
+    </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <xblock>
+        <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
+        <form class="layui-inline layui-form layui-form-pane1" action="">
+            <div class="layui-inline">
+                <select name="app" lay-filter="app">
+                    <option value="">请选项目</option>
+                    {volist name="app_list" id="vo"}
+                        {if condition="$vo.id eq $app_id"}
+                            <option value="{$vo.id}" selected>{$vo.name}</option>
+                        {else /}
+                            <option value="{$vo.id}">{$vo.name}</option>
+                        {/if}                        
+                    {/volist}                    
+                </select>
+            </div>
+        </form>
+        {if condition="$app_id neq 0"}
+            <button class="layui-btn right" onclick="navList('分类管理','{:url('ApiNav/navList',array('app_id' => $app_id))}','800','600')"><i class="layui-icon">&#xe608;</i> 分类管理</button>
+        {/if} 
+    </xblock>
+    {notempty name="api_data"}
+    <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="demo">
+        <ul class="layui-tab-title">            
+            {volist name="api_data" id="vo" key='key'}
+                {if condition="$key eq 1"}
+                    <li class="layui-this"><i class="layui-icon">{$vo.icon}</i>{$vo.name}</li> 
+                {else /}
+                    <li><i class="layui-icon">{$vo.icon}</i> {$vo.name}</li> 
+                {/if}                          
+            {/volist}            
+        </ul>
+        <div class="layui-tab-content" style="padding: 10px;">
+            {volist name="api_data" id="vo" key='key'}
+                <!-- {if condition="$key eq 1"}
+                    <div class="layui-tab-item layui-show">
+                        在这里，你将以最直观的形式体验Layui！在编辑器中可以执行layui相关的一切代码。
+                        <br>你也可以点击左侧导航针对性地试验我们提供的示例。                
+                    </div> 
+                {else /}
+                    <div class="layui-tab-item">{$vo.name}内容</div>
+                {/if}   -->                   
+                <div class="layui-tab-item {if condition='$key eq 1'}layui-show{/if}">                    
+                    <div class="nav">
+                        <button class="layui-btn layui-btn-mini" onclick="add_api('添加接口','{:url(\'addApi\',array(\'nav_id\' => $vo.id) )}','900','500')">添加接口</button>
+                        <span style='float:right;'>{$vo.name} 接口数量：<span class='right'>{$vo.api_count}</span></span>
+                    </div>
+                    <table class="layui-table" lay-even lay-skin="nob">
+                        <thead>
+                            <tr>
+                                <th>名称</th>                               
+                                <th>排序</th>
+                                <th class="handle">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {volist name="vo['api_list']" id="api"}
+                            <tr>
+                                <td>{$api.name}</td>
+                                <td>{$api.sort}</td>
+                                <td class="handle">
+                                    <a title="编辑" href="javascript:;" onclick="edit_api('编辑','{:url('editApi',array(\'api_id\' => $api.id))}','4','900','500')"
+                                    class="ml-5" style="text-decoration:none">
+                                        <i class="layui-icon">&#xe642;</i>
+                                    </a>
+                                    <a title="删除" href="javascript:;" onclick="del_api(this,{$api.id})" 
+                                    style="text-decoration:none">
+                                        <i class="layui-icon">&#xe640;</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {/volist}
+                        </tbody>
+                    </table>
+                </div>     
+            {/volist}   
+        </div>
+    </div>   
+    {/notempty}
+    <div id="page"></div>
+</div>
+
+<script>
+
+layui.use(['form','laydate','element','laypage','layer'], function(){
+    // $ = layui.jquery;//jquery
+    // laydate = layui.laydate;//日期插件
+    // lement = layui.element();//面包导航
+    // laypage = layui.laypage;//分页
+    // layer = layui.layer;//弹出层
+    var form = layui.form();
+
+    //以上模块根据需要引入
+    form.on('select(app)', function(data){        
+        var app_id = data.value;       
+        var url = "{:url('','','')}"+'/app_id/'+app_id;        
+        window.location.href = url;
+    });
+});
+
+/*添加*/
+function navList(title,url,w,h){
+    x_admin_show(title,url,w,h,function(){
+        location.reload();
+    });
+}
+
+/*添加*/
+function add_api(title,url,w,h){
+    x_admin_show(title,url,w,h);
+}
+
+/*编辑*/ 
+function edit_api (title,url,id,w,h) {
+    x_admin_show(title,url,w,h); 
+}
+
+/*删除api*/
+function del_api(obj,api_id){
+    var url = "{:url('delApi')}";
+    var data = {};
+    data['api_id'] = api_id;
+    post(data,url,function(ret){
+        var msg = ret.msg;
+        if(ret.success == true){
+            var tr = $(obj).parents('tr');
+            $(tr).remove();
+        }
+        layer.msg(msg);
+    });
+}
+
+/*删除*/
+function del(obj,id){
+    layer.confirm('确认要删除吗？',function(index){
+        var url = "{:url('delNav')}";
+        var data = {};
+        data['app_id'] = id;
+        post(data,url,function(ret){    //发异步删除数据
+            var msg = ret.msg;
+            if(ret.success == true){
+                $(obj).parents("tr").remove();
+            }                
+            layer.msg(msg,{icon:1,time:1000});
+        });
+        
+    });
+}
+</script>

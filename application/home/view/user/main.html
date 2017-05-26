@@ -1,0 +1,113 @@
+<style>
+.header .left{ left: 0; right:inherit !important; }
+.header .layui-nav .layui-nav-item{ height: 60px; }
+</style>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header header header-demo">
+        <div class="layui-main">
+            <ul class="layui-nav left" lay-filter="">
+                <li class="layui-nav-item">
+                    {notempty name="app_info"}
+                        <a href="javascript:;">{$app_info.name}</a>
+                    {else /}
+                        <a href="javascript:;">选择项目</a>
+                    {/notempty}                    
+                    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                        {volist name="app_list" id="vo"}
+                            <dd><a href="javascript:;" onclick='change_app({$vo.id})' >{$vo.name}</a></dd>                       
+                        {/volist}
+                    </dl>
+                </li>
+            </ul>
+            <!-- <a class="logo" href="./index.html">
+                X-admin v1.0
+            </a> -->
+            <ul class="layui-nav" lay-filter="">  
+                <li class="layui-nav-item">
+                    <a href="javascript:;">{$user_info['account']}</a>
+                    <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                        <dd><a href="">个人信息</a></dd>
+                        <dd><a href="">切换帐号</a></dd>
+                        <dd><a href="{:url('user/logout')}">退出</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                <a href="" title="消息">
+                    <i class="layui-icon" style="top: 1px;">&#xe63a;</i>
+                </a>
+                </li>
+                <li class="layui-nav-item"><a target='_blank' href="{:url('admin/index/main')}">接口管理</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree site-demo-nav" lay-filter="side">
+                {volist name="nav" id="vo"}
+                <li class="layui-nav-item">
+                    <a class="javascript:;" href="javascript:;">
+                        <i class="layui-icon" style="top: 3px;">{$vo['icon']}</i><cite>{$vo['name']}</cite>
+                    </a>
+                    <dl class="layui-nav-child">
+                    {volist name="vo['child']" id="v"}
+                        <dd class="">
+                            <dd class="">
+                                <a href="javascript:;" _href="{:url('home/user/api',array('api_id' => $v['id']))}">
+                                    <cite>{$v['name']}</cite>
+                                </a>
+                            </dd>
+                        </dd>
+                    {/volist}
+                    </dl>
+                </li>
+                {/volist}               
+                <!-- <li class="layui-nav-item" style="height: 30px; text-align: center">
+                </li> -->
+            </ul>
+        </div>
+    </div>
+    <div class="layui-tab layui-tab-card site-demo-title" lay-filter="x-tab" lay-allowclose="true">
+        <ul class="layui-tab-title">
+            <li class="layui-this">
+                我的桌面
+            </li>
+        </ul>
+        <div class="layui-tab-content site-demo site-demo-body">
+            <div class="layui-tab-item layui-show">
+                <iframe frameborder="0" src="{:url('welcome')}" class="x-iframe"></iframe>
+            </div>
+        </div>
+    </div>
+    <div class="site-tree-mobile layui-hide">
+        <i class="layui-icon">
+            &#xe602;
+        </i>
+    </div>
+    <div class="site-mobile-shade">
+    </div>
+</div>
+
+<script>
+function change_app(app_id){
+    console.log(app_id);
+    var data = {};
+    data['app_id'] = app_id;
+    var url = "{:url('home/user/changeApp')}";
+    post(data,url,function(ret){
+        if(ret.success == true){
+            location.reload();
+        }
+    });
+}
+layui.use('form', function(){
+   
+});
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+

@@ -1,0 +1,254 @@
+<script src="/static/common/js/md5.js"></script>
+<script src="/static/home/api/json.js"></script>
+<link rel="stylesheet" href="/static/home/api/json.css" media="all">
+<style>
+.layui-input-block input {
+    width: 500px;    
+    display: inline-block;
+}
+.remark{     color: #9e9797;    margin-left: 10px; }
+</style>
+<style>
+    #TabSize{ width: 50px; margin: 0 5px; }
+</style>
+<div class='layui-tab-content'>
+	<fieldset class="layui-elem-field">
+	  	<legend>{$api['name']} API</legend>
+	  	<div class="layui-field-box">
+			<form class="layui-form layui-form-pane1" action="">
+				<div class="layui-form-item">
+					<label class="layui-form-label">请求路径:</label>
+					<div class="layui-input-block">
+						<input type="text" name="api_url" value="{$app_info.domain}{$api.url}" required placeholder="" autocomplete="off" class="layui-input">					
+						<div class="layui-inline" style=" line-height: 21px; padding: 0 0 0px 10px;">                        
+                            <input type="checkbox" name="localhost" lay-skin="switch" lay-filter="domain" title="开关">
+                        </div>          
+                        <span class="remark">切换地址</span>         
+					</div>
+				</div>
+				{volist name="api_param" id="vo"}
+				<div class="layui-form-item">
+					<label class="layui-form-label">{$vo['name']}</label>
+					<div class="layui-input-block">
+						
+						<input type="text" value="{$vo['value']}" name="{$vo['name']}" required placeholder="" autocomplete="off" class="layui-input {$vo['class']}" encrypt="{$vo['encrypt']}">
+												
+						<span class="remark">{$vo['remark']}</span>
+					</div>
+				</div>
+				{/volist}				
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit lay-filter="*">提交</button>
+						<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</fieldset>
+	
+	<div class="layui-tab  layui-tab-card">
+		<ul class="layui-tab-title">
+			<li class="layui-this">json格式</li>
+			<li>源码</li>				
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show" id=''>
+				<blockquote class="layui-elem-quote layui-quote-nm">
+				<div id="ControlsRow"> 
+					<form>
+					<span id="TabSizeHolder">
+						缩进量
+						<select id="TabSize" onchange="TabSizeChanged()">
+						  <option value="1">1</option>
+						  <option value="2" selected="true">2</option>
+						  <option value="3">3</option>
+						  <option value="4">4</option>
+						  <option value="5">5</option>
+						  <option value="6">6</option>
+						</select>
+					</span>
+					<label for="QuoteKeys">
+						<input type="checkbox" id="QuoteKeys" onclick="QuoteKeysClicked()" checked="true" /> 
+						引号
+					</label>&nbsp; 
+	  				<a href="javascript:void(0);" onclick="SelectAllClicked()">全选</a>
+	  				&nbsp;
+				  	<span id="CollapsibleViewHolder" >
+				      	<label for="CollapsibleView">
+				        	<input type="checkbox" id="CollapsibleView" onclick="CollapsibleViewClicked()" checked="true" /> 
+				        	显示控制
+				      </label>
+				  	</span>
+					<span id="CollapsibleViewDetail">
+						<a href="javascript:void(0);" onclick="ExpandAllClicked()">展开</a>
+						<a href="javascript:void(0);" onclick="CollapseAllClicked()">叠起</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(3)">2级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(4)">3级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(5)">4级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(6)">5级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(7)">6级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(8)">7级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(9)">8级</a>
+					</span>
+				</div>
+				</blockquote>
+				<div id="Canvas" class="Canvas">
+					<pre style='height: 300px;'>
+					</pre>
+				</div>
+			</div>
+			<div class="layui-tab-item Canvas">
+				<textarea id='RawJson' style="" readonly='true'></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+
+//localStorage支持验证
+function localStorageCheck(){
+	if(!window.localStorage){
+        layer.open({
+           title: "温馨提示",
+           icon: 2,
+           content: '您当前浏览器不支持localstorage'	                   
+        });   
+        return false;
+    }else{
+    	
+    }
+}
+
+//根据缓存初始化页面
+function initialize(){		
+	$("input.storage").each(function(){
+		var storage_key = api_storage_key($(this).attr('name'));
+		var field = window.localStorage.getItem(storage_key);
+		if(field != '' && field != undefined){
+			$(this).val(field);		
+		}		
+	});
+}
+
+function api_storage_key(param_name){
+	var app_id = "{$app_info['id']}";	//当前接口	
+	return app_id + '_' + param_name;
+}
+
+layui.use('form', function(){	
+	localStorageCheck();
+	initialize();
+	
+	var form = layui.form();
+
+	//自定义验证规则
+	form.verify({
+		title: function(value){
+		  	if(value.length < 5){
+		    	return '标题也太短了吧';
+		  	}
+		}
+		,pass: [/(.+){6,12}$/, '密码必须6到12位']
+	});
+
+
+	//事件监听
+	form.on('select', function(data){
+		console.log(data);
+	});
+
+	form.on('select(aihao)', function(data){
+		console.log(data);
+	});
+
+	form.on('checkbox', function(data){
+		console.log(data.elem.checked);
+	});
+
+	form.on('switch(domain)', function(data){
+		var checked = $(data.elem).attr('checked');
+		if(checked == 'checked'){
+			var domain = "{$app_info.test_domain}";			
+		}else{
+			var domain = "{$app_info.domain}";
+		}
+		var url  = domain + "{$api.url}";
+		$('input[name="api_url"]').val(url);
+	});
+
+	form.on('radio', function(data){
+		console.log(data);
+	});
+
+	//监听提交
+	form.on('submit(*)', function(data){
+		var field = data.field;
+		var url = "{:url('apiPost')}";
+
+		save_api_param(field);  //对提交的参数进行本地存储
+		
+		field = field_encrypt(field);
+		console.log(field);
+		post(field,url,function(data){
+			
+			api_callback(data);
+		});
+
+		return false;
+	});
+  
+});
+
+//测试回调
+function api_callback(ret){
+	var code = ret.data;
+	$('#RawJson').val(ret.data);	
+	//$id("RawJson").innerHTML = ret.data;
+	
+	try{
+    	var json = JSON.parse(ret.data);
+    	Process();	
+    	layer.msg('请求成功');
+	}catch(e){
+		layer.msg('JSON数据格式不正确');
+		//alert("JSON数据格式不正确:\n"+e.message);
+		//$id("Canvas").innerHTML = "";
+	}
+}
+
+
+
+
+//字段加密处理
+function field_encrypt(field){
+	$("input.storage[encrypt != 'normal']").each(function(){
+		var val = $(this).val();
+		var key = $(this).attr('name');
+		var encrypt = $(this).attr('encrypt');
+		switch(encrypt){
+		case 'md5':
+			var val = hex_md5(val);
+			break;
+		case 'base64':
+			break;
+		}		
+		
+		field[key] = val;
+	});
+	return field;
+}
+
+function save_api_param(field_data){
+
+	for(var key in field_data){
+		var storage_key = api_storage_key(key); 
+		var storage_value = field_data[key];
+		window.localStorage.setItem(storage_key,storage_value);		
+	}
+}
+
+function get_api_param(){
+
+}
+</script>

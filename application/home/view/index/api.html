@@ -1,0 +1,358 @@
+<script src="/static/common/js/md5.js"></script>
+<script src="/static/home/api/json.js"></script>
+<link rel="stylesheet" href="/static/home/api/json.css" media="all">
+<link rel="stylesheet" href="/static/common/css/common.css" media="all">
+<style>
+
+
+</style>
+<style>
+header{ height: 50px; background-color: #114e4e; }
+header .api_logo{display: inline-block;  font-size: 25px;  color: white;  padding: 10px 15px;}
+header .login{ float: right; height: 50px; color: #fff; padding: 0; }
+header .login span{ padding: 14px 10px; font-size: 16px; display: inline-block; height: 22px;}
+header .login span:active,header .login span:hover{color:aliceblue;}
+header .login span.reg{ padding: 14px 18px; background-color: #1ec9d2;}
+header .login span.reg:active,header .login span.reg:hover{ background-color: #2edbe4; color:#fff;  },
+
+
+.layui-tab-content{ margin: auto; min-width: 500px; }
+#TabSize{ width: 50px; margin: 0 5px; }
+.url_block{ padding-right: 97px;position: relative; }
+.url_block .layui-input-block{ }
+.url_block .submit{ position: absolute;; right: 0px; top:0px; }
+.param_block{padding-right: 80px; position: relative;}
+.param_del{ position: absolute; right: 0px; top: 0px; font-size: 30px; }
+
+.reg_block{display: none; width: 600px; height: 360px; position: absolute; left: 50%; top: 50%; margin-top:-225px; margin-left: -300px; background-color: rgba(0, 0, 0, 0.05); padding: 16px 20px;-webkit-box-sizing: border-box;  -moz-box-sizing: border-box;  box-sizing: border-box;  box-shadow: 8px 8px 10px rgba(136, 136, 136, 0.2);}
+.reg_block *{ -webkit-box-sizing: border-box;  -moz-box-sizing: border-box;  box-sizing: border-box; }
+.reg_block > div { background-color: #fff; height: 100%; position: relative;}
+.reg_block > div > *{ height: 40px; font-size: 24px; color: #929292; padding: 0 10px; border-radius: 3px;}
+
+.reg_block > div > .close{ position: absolute; font-size: 30px; color:#929292; top: 10px; right: 0px;}
+.reg_block > div > .header{ position: absolute; left: 66px; width: 430px; top: 20px; padding: 0; text-align: center;line-height: 40px;}
+.reg_block > div > .header .title{ color: #18a293; }
+
+.reg_block > div input{ position: absolute;  left: 66px;  width: 430px;  background-repeat: no-repeat;  background-size: 20px;  background-position: 8px 8px;  padding-left: 40px;  border: 1px solid #ddd;
+}
+.reg_block > div input:focus{     box-shadow: inset 0px 0px 3px #CCC;
+  }
+.reg_block > div input[name="account"]{ top: 70px; background-image: url(/static/home/api/img/account.png); }
+.reg_block > div input[name="password"]{ top: 130px; background-image: url(/static/home/api/img/password.png);}
+.reg_block > div input[name="code"]{ top: 190px; width: 280px; background-image: url(/static/home/api/img/code.png);}
+.reg_block > div .get_code{ position: absolute; width: 130px; left:363px; top:190px; display: block;  border: 1px solid #ccc; line-height: 40px; text-align: center;font-size: 16px;background-color: #18a293;  color: white;}
+.reg_block > div .get_code:hover{ background-color: #12827A; }
+.reg_block > div .get_code:active{ background-color: #0d6760; }
+.reg_block > div .reg{ line-height: 40px; color: #fff; text-align: center; position: absolute; left: 66px; top: 250px; background-color: #18a293; width: 430px; font-size: 20px;}
+.reg_block > div .reg:hover{ background-color: #12827A; }
+.reg_block > div .reg:active{ background-color: #0d6760; }
+
+
+</style>
+<header>
+	<div class="list">
+		<div class="api_logo">API-test</div>
+		<div class="login">
+			<span class="api-btn" onclick="login()">登陆</span>
+			<span class="api-btn reg" onclick="reg()">注册</span>
+		</div>
+	</div>
+</header>
+<div class='layui-tab-content'>
+	<fieldset class="layui-elem-field">
+	  	<legend>API</legend>
+	  	<div class="layui-field-box">
+			<form class="layui-form layui-form-pane1" action="">
+				<div id="param_block">
+					<div class="layui-form-item  url_block">
+						<label class="layui-form-label">请求路径:</label>
+						<div class="layui-input-block">
+							<input type="text" name="api_url" value="" required placeholder="接口url" autocomplete="off" class="layui-input">	
+						</div>
+						
+						<div class="layui-inline submit">
+							<button class="layui-btn" lay-submit lay-filter="*">提交</button>										
+						</div>
+						
+					</div>
+								
+				</div>
+				<fieldset class="layui-elem-field">
+				  	<legend><div class="layui-btn layui-btn-radius" onclick="add_param(this)" style=" font-size: 14px;">添加参数</div>	</legend>
+				  	<div class="layui-field-box">
+				  		
+						<div id='params_form'>
+							<div class="layui-form-item param_block">
+								<div style="width: 100px;  padding: 0; float: left;">
+									<input type="text" value="" name="param" required placeholder="参数名称" autocomplete="off" class="layui-input">	
+								</div>
+								<div class="layui-input-block" >						
+									<input type="text" value="" name="value" required placeholder="参数内容" autocomplete="off" class="layui-input">				
+								</div>
+								<div class="layui-btn layui-btn-primary param_del" onclick="del_param(this)">
+									<i class="layui-icon">&#x1006;</i> 
+								</div> 
+							</div>	
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</fieldset>
+	
+	<div class="layui-tab  layui-tab-card">
+		<ul class="layui-tab-title">
+			<li class="layui-this">json格式</li>
+			<li>源码</li>				
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show" id=''>
+				<blockquote class="layui-elem-quote layui-quote-nm">
+				<div id="ControlsRow"> 
+					<form>
+					<span id="TabSizeHolder">
+						缩进量
+						<select id="TabSize" onchange="TabSizeChanged()">
+						  <option value="1">1</option>
+						  <option value="2" selected="true">2</option>
+						  <option value="3">3</option>
+						  <option value="4">4</option>
+						  <option value="5">5</option>
+						  <option value="6">6</option>
+						</select>
+					</span>
+					<label for="QuoteKeys">
+						<input type="checkbox" id="QuoteKeys" onclick="QuoteKeysClicked()" checked="true" /> 
+						引号
+					</label>&nbsp; 
+	  				<a href="javascript:void(0);" onclick="SelectAllClicked()">全选</a>
+	  				&nbsp;
+				  	<span id="CollapsibleViewHolder" >
+				      	<label for="CollapsibleView">
+				        	<input type="checkbox" id="CollapsibleView" onclick="CollapsibleViewClicked()" checked="true" /> 
+				        	显示控制
+				      </label>
+				  	</span>
+					<span id="CollapsibleViewDetail">
+						<a href="javascript:void(0);" onclick="ExpandAllClicked()">展开</a>
+						<a href="javascript:void(0);" onclick="CollapseAllClicked()">叠起</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(3)">2级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(4)">3级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(5)">4级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(6)">5级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(7)">6级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(8)">7级</a>
+						<a href="javascript:void(0);" onclick="CollapseLevel(9)">8级</a>
+					</span>
+				</div>
+				</blockquote>
+				<div id="Canvas" class="Canvas">
+					<pre style='height: 300px;'>
+					</pre>
+				</div>
+			</div>
+			<div class="layui-tab-item Canvas">
+				<textarea id='RawJson' style="" readonly='true'></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="reg_block">
+	<div>
+		<i class="layui-icon close lui-btn" >&#x1006;</i>  
+		<div class="header">
+			<span class="title">用户注册</span>			
+		</div>
+		<input type="text" name="account">
+		<input type="password" name="password">
+		<input type="text" name="code">
+		<div class="lui-btn get_code" onclick="get_code(this)">获取短信</div>
+		<div class="lui-btn reg" onclick="reg(this)">注册</div>
+	</div>
+</div>
+<script>
+//注册js start -----------------------------------------------
+//获取验证码
+function get_code(obj){
+	$liu.btn_loading(obj); 
+} 
+function login(){
+	window.location.href = "{:url('user/login')}";
+}
+
+function reg(obj){
+	$liu.btn_loaded(obj); 
+	//window.location.href = "{:url('user/reg')}";
+}
+//注册js end -----------------------------------------------------
+
+//添加参数
+function add_param(obj){
+	var html = '';
+
+	html = '<div class="layui-form-item param_block">'+
+						'<div style="width: 100px;  padding: 0; float: left;">'+
+							'<input type="text" value="" name="param" required="" placeholder="参数名称" autocomplete="off" class="layui-input">'+	
+						'</div>'+
+						'<div class="layui-input-block">'+						
+							'<input type="text" value="" name="value" required="" placeholder="参数内容" autocomplete="off" class="layui-input">'+				
+						'</div>'+			
+						'<div class="layui-btn layui-btn-primary param_del" onclick="del_param(this)">'+
+							'<i class="layui-icon">&#x1006;</i> '+
+						'</div>'+
+					'</div>';
+
+	$('#params_form').append(html);
+}
+
+//删除参数
+function del_param(obj){
+	$(obj).parents('.param_block').remove();
+}
+
+//localStorage支持验证
+function localStorageCheck(){
+	if(!window.localStorage){
+        layer.open({
+           title: "温馨提示",
+           icon: 2,
+           content: '您当前浏览器不支持localstorage'	                   
+        });   
+        return false;
+    }else{
+    	
+    }
+}
+
+//根据缓存初始化页面
+function initialize(){		
+	$("input.storage").each(function(){
+		var storage_key = api_storage_key($(this).attr('name'));
+		var field = window.localStorage.getItem(storage_key);
+		$(this).val(field);		
+	});
+}
+
+function api_storage_key(param_name){
+	var api_id = 'test';	//当前接口	
+	return api_id + '_' + param_name;
+}
+
+layui.use('form', function(){	
+	localStorageCheck();
+	initialize();
+	
+	var form = layui.form();
+
+	//自定义验证规则
+	form.verify({
+		title: function(value){
+		  	if(value.length < 5){
+		    	return '标题也太短了吧';
+		  	}
+		}
+		,pass: [/(.+){6,12}$/, '密码必须6到12位']
+	});
+
+
+	//事件监听
+	form.on('select', function(data){
+		console.log(data);
+	});
+
+	form.on('select(aihao)', function(data){
+		console.log(data);
+	});
+
+	form.on('checkbox', function(data){
+		console.log(data.elem.checked);
+	});
+	
+
+	form.on('radio', function(data){
+		console.log(data);
+	});
+
+	//监听提交
+	form.on('submit(*)', function(data){
+		var field = data.field;
+		var url = "{:url('apiPost')}";
+
+		var param = {};
+		var data = {};
+		data['api_url'] = $('input[name="api_url"]').val();
+		
+	  	$(".param_block").each(function(){
+	    	var key = $(this).find('input[name="param"]').val();
+	    	var value = $(this).find('input[name="value"]').val();
+	    	if(key != '' && value != ''){
+	    		param[key] = value;
+	    	}	    	
+	  	});
+		
+		data['param'] = param;
+		console.log(data);
+		
+		post(data,url,function(data){
+			
+			api_callback(data);
+		});
+
+		return false;
+	});
+  
+});
+
+//测试回调
+function api_callback(ret){
+	console.log(ret);
+	var code = ret.data;
+	$('#RawJson').val(ret.data);	
+	//$id("RawJson").innerHTML = ret.data;
+	
+	try{
+    	var json = JSON.parse(ret.data);
+    	Process();	
+    	layer.msg('请求成功');
+	}catch(e){
+		layer.msg('JSON数据格式不正确');
+		//alert("JSON数据格式不正确:\n"+e.message);
+		//$id("Canvas").innerHTML = "";
+	}
+}
+
+
+
+
+//字段加密处理
+function field_encrypt(field){
+	$("input.storage[encrypt != 'normal']").each(function(){
+		var val = $(this).val();
+		var key = $(this).attr('name');
+		var encrypt = $(this).attr('encrypt');
+		switch(encrypt){
+		case 'md5':
+			var val = hex_md5(val);
+			break;
+		case 'base64':
+			break;
+		}		
+		
+		field[key] = val;
+	});
+	return field;
+}
+
+function save_api_param(field_data){
+
+	for(var key in field_data){
+		var storage_key = api_storage_key(key); 
+		var storage_value = field_data[key];
+		window.localStorage.setItem(storage_key,storage_value);		
+	}
+}
+
+function get_api_param(){
+
+}
+</script>

@@ -10,3 +10,25 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+
+/*
+ * 自定义成功数据结构
+ */
+function json_success($msg = '',$data = array()){
+	$json['success'] = true;
+	$json['msg'] = $msg;
+	$json['data'] = $data;
+	echo json_encode($json);
+    exit;
+}
+
+/*
+ * 自定义失败数据结构
+ */
+function json_error($msg = '',$data = array()){
+	$json['success'] = false;
+	$json['msg'] = $msg;
+	$json['data'] = $data;
+	echo json_encode($json);
+    exit;
+}
