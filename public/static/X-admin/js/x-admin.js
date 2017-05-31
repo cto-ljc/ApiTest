@@ -20,16 +20,17 @@ layui.use(['element'], function(){
     	url = elem.find('a').attr('_href');
     	id = elem.find('cite').text();
     	
-    	// alert(url);
+    	//console.log($('.layui-tab-title li#'+id).length == 0);
 
     	if($('.layui-tab-title li#'+id).length){	//如果不存在该选项卡 则创建 否则切换    		
     		var index = $(".layui-tab-title li").index($('.layui-tab-title li#'+id));
-    		element.tabDelete('x-tab', index);    		
+    		element.tabDelete('x-tab', id);  
     	}
 
     	res = element.tabAdd('x-tab', {
 	        title: title//用于演示
-	        ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>'
+	        ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
+	        id:id
 	    });
 
 	    element.tabChange('x-tab', $('.layui-tab-title li').length-1);
@@ -37,18 +38,8 @@ layui.use(['element'], function(){
 	    var length = $('.layui-tab-title li').length;
 	    $('.layui-tab-title li').eq(length - 1).attr('id',id);	
     	
-
-	    //$('.layui-tab-title li').eq(0).find('i').remove();
-	    //切换到第2项（注意序号是从0开始计算）
-    	
-    	//$('.x-admin-title').append("<li class='layui-this'>"+title+"<i class='layui-icon layui-unselect layui-tab-close'>ဆ</i></li>")
+	    element.tabChange('x-tab', id);	    
   	});
-
-	// element.on('tab', function(data){
-	// 	console.log(this); //当前Tab标题所在的原始DOM元素
-	// 	console.log(data.index); //得到当前Tab的所在下标
-	// 	console.log(data.elem); //得到当前的Tab大容器
-	// });
 
 	
 });

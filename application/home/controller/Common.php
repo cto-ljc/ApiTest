@@ -20,7 +20,7 @@ class Common extends \think\Controller{
     protected function checkOnline(){        
         $this -> uid = Session::get('uid');
         if(!$this -> uid){            
-            $this->redirect('login/login');
+            $this->redirect('index/api');
         }       
     }
 }

@@ -13,14 +13,15 @@ class AppModel extends Model{
 	 * @param int $uid 用户id
 	 */
 	public function getAppList($uid){		
-		$map['u.uid'] = $uid;
+		$app_ids = db('user') -> where(array('uid' => $uid)) -> value('app_ids');
+        $app_ids = explode(',',$app_ids,-1);
+		$map['id'] = array('in',$app_ids);
 		$field = 'a.*';
 		$app_list = Db::name('app') 
 			-> alias('a')
-			-> field($field)
-			-> join('team t','t.id = a.team_id')
-			-> join('user u','u.uid = t.uid')
-			-> where($map) -> order(array('a.sort' => 'asc')) -> select();
+			-> field($field)			
+			-> where($map) 
+			-> order(array('a.sort' => 'asc')) -> select();
 		return $app_list;
 	}
 

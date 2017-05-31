@@ -23,5 +23,5 @@
 		$(obj).html(html);	
 		localStorage.removeItem(obj);  		
 	}
-	window.$liu = u;
+	window.$lui = u;
 })(window);

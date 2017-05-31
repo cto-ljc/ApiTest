@@ -28,6 +28,21 @@ class Login extends \think\Controller{
 		}		
 	}
 
+    //登陆页
+    public function emailLogin(){
+        if(request() -> isPost()){
+            $account = input('post.email');
+            $password = input('post.password');
+
+            $UserModel = Loader::model('UserModel');                      //实例化模型
+            if($user_info = $UserModel -> login($account,$password)){
+                json_success('成功');
+            }else{
+                json_error($UserModel -> getError());
+            }       
+        }    
+    }
+
 	protected function check_online(){        
         $this -> uid = Session::get('uid');
         if($this -> uid){            

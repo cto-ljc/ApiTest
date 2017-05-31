@@ -11,7 +11,7 @@ class UserModel extends BaseUserModel{
     protected $table = 'api_user';
 
     //管理员uid列表
-    private $admin_uids = array('1','6');
+    private $admin_uids = array('1');
 
     /*
      * 管理员登录
@@ -27,10 +27,15 @@ class UserModel extends BaseUserModel{
     	}
 
         $uid = $user_info['uid'];
-    	if(!in_array($uid,$this -> admin_uids)){
-    		$this -> error = '账号没有权限';
-    		return false;
-    	}
+    	// if(!in_array($uid,$this -> admin_uids)){
+    	// 	$this -> error = '账号没有权限';
+    	// 	return false;
+    	// }
+
+        if($user_info['rid'] > 1){
+            $this -> error = '账号没有权限';
+            return false;
+        }
 
         if($user_info['password'] != $this -> encodePWD($password,$user_info['salt'])){
             $this -> error = '账号或密码错误';
@@ -93,8 +98,9 @@ class UserModel extends BaseUserModel{
      * 管理员添加
      * @param string $account 账号
      * @param string $password 密码
+     * @param string $uid 操作人uid
      */
-    public function admina_Add($account,$password){
+    public function admina_Add($account,$password,$app_ids){
 
         $map["account"] = $account;
         $user = Db::name("user") -> where($map) -> select();
@@ -109,6 +115,9 @@ class UserModel extends BaseUserModel{
         $data["state"] = 0;
         $data["add_time"] = time();
         $data["del"] = 0;
+        $data['app_ids'] = $app_ids;
+        $data['rid'] = 2;
+
         $adminaAdd = Db::name('user') -> insert($data);
         if ($adminaAdd) {
             return $adminaAdd;

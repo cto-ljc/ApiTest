@@ -1,0 +1,69 @@
+<style type="text/css">
+.checkbox-block{ margin-bottom: 10px; }
+</style>
+<div class="layui-tab-content">
+	<form class="layui-form" action="">
+		<div class="checkbox-block">
+			{volist name="app_list" id="vo"}
+				<input type="checkbox" name="app" title="{$vo.name}" value="{$vo.id}" lay-skin="primary" 
+					{if condition="in_array($vo.id,$app_ids)"}checked{/if}
+				>
+			{/volist}
+	    </div>
+	    <button class="layui-btn" lay-submit lay-filter="formDemo">保存</button>	      
+	</form>
+	
+    
+</div>
+
+<script type="text/javascript">
+layui.use(['form','layer'], function(){
+	
+    var form = layui.form();
+
+    //以上模块根据需要引入
+    form.on('select(app)', function(data){        
+        var app_id = data.value;       
+        var url = "{:url('','','')}"+'/app_id/'+app_id;        
+        window.location.href = url;
+    });
+
+    //监听提交
+  	form.on('submit(formDemo)', function(data){
+  		var app_ids = '';
+  		$('input[name="app"]').each(function(){
+  			
+  			if ($(this).attr("checked")) {  
+                var app_id = $(this).attr('value');
+  				app_ids += app_id + ',';
+            }  
+  		});
+  		
+  		var url = "{:url('',input('param.'))}";
+  		console.log(url);  		
+  		var data = {};
+  		data['app_ids'] = app_ids;
+
+  		$.ajax({
+			type:"post",
+			url:url,
+			data:data,
+			dataType:'json',
+			success: function (data) {			
+				layer.msg(data.msg); 
+	        },
+	       	error: function (error) { 	       		
+	       		layer.msg('网络错误'); 
+	       	},
+	        beforeSend: function(){
+		   		
+		   	},
+		    complete: function(){
+		    	
+		    },
+		})
+    	//layer.msg(JSON.stringify(data.field));
+    	return false;
+  	});
+});
+</script>

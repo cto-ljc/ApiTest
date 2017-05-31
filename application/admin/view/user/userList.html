@@ -7,7 +7,7 @@
     <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
 </div>
 <div class="x-body">
-    <form class="layui-form x-center" action="" style="width:80%">
+    <form class="layui-form x-center" action="" >
         <div class="layui-form-pane" style="margin-top: 15px;">
           <div class="layui-form-item">
             <label class="layui-form-label">日期范围</label>
@@ -69,6 +69,10 @@
                     <a title="修改密码" href="javascript:;" onclick="update_password('修改密码','{:url(\'updatePassword\',array('uid' => $vo.uid))}','800','600')"
                     class="ml-5" style="text-decoration:none">
                         <i class="layui-icon">&#xe631;</i>
+                    </a>
+                    <a title="权限" href="javascript:;" onclick="edit_user('权限','{:url(\'power\',array('uid' => $vo.uid))}','800','600')"
+                    class="ml-5" style="text-decoration:none">
+                        <i class="layui-icon">&#xe60a;</i>
                     </a>
                     <a title="删除" href="javascript:;" onclick="del_user({$vo.uid})" 
                     style="text-decoration:none">

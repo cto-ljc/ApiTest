@@ -15,7 +15,14 @@
 					<span class="remark"></span>
 				</div>
 			</div>
-			
+			<div class="layui-form-item">
+				<label class="layui-form-label">app列表:</label>
+				<div class="layui-input-block">
+					{volist name="app_list" id="vo"}
+						<input type="checkbox" name="app" title="{$vo.name}" value="{$vo.id}" lay-skin="primary" >
+					{/volist}
+				</div>
+			</div>
 			<div class="layui-form-item">
 				<div class="layui-input-block">
 					<button class="layui-btn" lay-submit lay-filter="*">提交</button>
@@ -67,6 +74,16 @@ layui.use('form', function(){
 		var url = "{:url('',input('param.'))}";
 		
 		field['uid'] = "{:input('param.uid')}";
+
+		var app_ids = '';
+  		$('input[name="app"]').each(function(){
+  			
+  			if ($(this).attr("checked")) {  
+                var app_id = $(this).attr('value');
+  				app_ids += app_id + ',';
+            }  
+  		});
+  		field['app_ids'] = app_ids;
 		post(field,url,function(ret){
 			var msg = ret.msg;
 			layer.msg(msg);

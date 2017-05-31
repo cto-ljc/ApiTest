@@ -24,11 +24,12 @@ class User extends Common{
     //添加用户 ,刘海诚 2017年2月7日17:02:28
     public function adminAdd(){
         if (request()->isPost()) {
-            $account=input("post.account");
-            $password=input("post.password");
+            $account = input("post.account");
+            $password = input("post.password");
+            $app_ids = input("post.app_ids");
 
             $UserModel = Loader::model('UserModel');
-            $admina_Add = $UserModel -> admina_Add($account,$password);
+            $admina_Add = $UserModel -> admina_Add($account,$password,$app_ids);
 
             if ($admina_Add) {
                json_success('添加成功');
@@ -36,6 +37,8 @@ class User extends Common{
                 json_error('添加失败');
             }
         }else{
+            $app_list = db('app') -> select();
+            $this -> assign('app_list',$app_list);
             return view();
         }
     }
@@ -76,6 +79,32 @@ class User extends Common{
                 json_error('修改失败');
             }            
         }else{
+            return view();
+        }        
+    }
+
+    //用户权限设置
+    public function power(){
+        $uid = input('param.uid');
+        if(request() -> isPost()){
+            
+            $app_ids = input('post.app_ids');
+
+            $data['app_ids'] = $app_ids;
+            
+            if(db('user') -> where(array('uid' => $uid)) -> update($data) !== false){
+                json_success('修改成功');
+            }else{
+                json_error('修改失败');
+            }            
+        }else{
+            $app_list = db('app') -> select();
+            $app_ids = db('user') -> where(array('uid' => $uid)) -> value('app_ids');
+            $app_ids = explode(',',$app_ids,-1);
+            
+            //dump($app_list);
+            $this -> assign('app_list',$app_list);
+            $this -> assign('app_ids',$app_ids);
             return view();
         }        
     }

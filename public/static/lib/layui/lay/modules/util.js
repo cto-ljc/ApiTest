@@ -1,2 +1,69 @@
-/** layui-v1.0.7 LGPL License By http://www.layui.com */
- ;layui.define("jquery",function(l){"use strict";var o=layui.jquery,i={fixbar:function(l){l=l||{},l.bgcolor=l.bgcolor?"background-color:"+l.bgcolor:"";var i,a,c="layui-fixbar-top",t=[l.bar1===!0?"&#xe606;":l.bar1,l.bar2===!0?"&#xe607;":l.bar2,"&#xe604;"],r=o(['<ul class="layui-fixbar">',l.bar1?'<li class="layui-icon" lay-type="bar1" style="'+l.bgcolor+'">'+t[0]+"</li>":"",l.bar2?'<li class="layui-icon" lay-type="bar2" style="'+l.bgcolor+'">'+t[1]+"</li>":"",'<li class="layui-icon '+c+'" lay-type="top" style="'+l.bgcolor+'">'+t[2]+"</li>","</ul>"].join("")),e=r.find("."+c),s=function(){var i=o(document).scrollTop();i>=(l.showHeight||200)?a||(e.show(),a=1):a&&(e.hide(),a=0)};o(".layui-fixbar")[0]||("object"==typeof l.css&&r.css(l.css),o("body").append(r),s(),r.find("li").on("click",function(){var i=o(this),a=i.attr("lay-type");"top"===a&&o("html,body").animate({scrollTop:0},200),l.click&&l.click.call(this,a)}),o(document).on("scroll",function(){i&&clearTimeout(i),i=setTimeout(function(){s()},100)}))}};l("util",i)});
+/**
+
+ @Name：layui.util 工具集
+ @Author：贤心
+ @License：MIT
+    
+*/
+
+layui.define('jquery', function(exports){
+  "use strict";
+  
+  var $ = layui.jquery
+  
+  ,util = {
+    //固定块
+    fixbar: function(options){  
+      options = options || {};
+      options.bgcolor = options.bgcolor ? ('background-color:' + options.bgcolor) : '';
+
+      var TOP_BAR = 'layui-fixbar-top', timer, is, icon = [
+        options.bar1 === true ? '&#xe606;' : options.bar1 //bar1 - 信息图标
+        ,options.bar2 === true ? '&#xe607;' : options.bar2 //bar2 - 问号图标
+        ,'&#xe604;' //置顶
+      ]
+      
+      ,dom = $(['<ul class="layui-fixbar">'
+        ,options.bar1 ? '<li class="layui-icon" lay-type="bar1" style="'+ options.bgcolor +'">'+ icon[0] +'</li>' : ''
+        ,options.bar2 ? '<li class="layui-icon" lay-type="bar2" style="'+ options.bgcolor +'">'+ icon[1] +'</li>' : ''
+        ,'<li class="layui-icon '+ TOP_BAR +'" lay-type="top" style="'+ options.bgcolor +'">'+ icon[2] +'</li>'
+      ,'</ul>'].join(''))
+      
+      ,topbar = dom.find('.'+TOP_BAR)
+      
+      ,scroll = function(){
+        var stop = $(document).scrollTop();
+        if(stop >= (options.showHeight || 200)){
+          is || (topbar.show(), is = 1);
+        } else {
+          is && (topbar.hide(), is = 0);
+        }
+      };
+      
+      if($('.layui-fixbar')[0]) return;
+      typeof options.css === 'object' && (dom.css(options.css));
+      $('body').append(dom), scroll();
+      
+      //bar点击事件
+      dom.find('li').on('click', function(){
+        var othis = $(this), type = othis.attr('lay-type');
+        if(type === 'top'){
+          $('html,body').animate({
+            scrollTop : 0
+          }, 200);;
+        }
+        options.click && options.click.call(this, type);
+      });
+      
+      //Top显示控制
+      $(document).on('scroll', function(){
+        if(timer) clearTimeout(timer);
+        timer = setTimeout(function(){
+          scroll();
+        }, 100);
+      });
+    }
+  };
+  
+  exports('util', util);
+});

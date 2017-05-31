@@ -7,6 +7,15 @@
 
 </style>
 <style>
+page{ position: absolute; width: 100%; height: 100%; left: 0; right: 0; -webkit-transition-duration: .3s;   transition-duration: .3s; z-index: 0; display: none;}
+page.show{ display: block; z-index: 1 }
+/*page#main{ z-index: 100; }*/
+page.left{ left: -100%; }
+page.right{ right: -100%; }
+page.top{ top: -100%; }
+page.bottom{ top: -100%; }
+page.behind{ z-index: -1; }
+
 header{ height: 50px; background-color: #114e4e; }
 header .api_logo{display: inline-block;  font-size: 25px;  color: white;  padding: 10px 15px;}
 header .login{ float: right; height: 50px; color: #fff; padding: 0; }
@@ -49,6 +58,7 @@ header .login span.reg:active,header .login span.reg:hover{ background-color: #2
 
 
 </style>
+<page class="show" id="main">
 <header>
 	<div class="list">
 		<div class="api_logo">API-test</div>
@@ -157,6 +167,8 @@ header .login span.reg:active,header .login span.reg:hover{ background-color: #2
 		</div>
 	</div>
 </div>
+</page>
+
 <div class="reg_block">
 	<div>
 		<i class="layui-icon close lui-btn" >&#x1006;</i>  
@@ -170,15 +182,78 @@ header .login span.reg:active,header .login span.reg:hover{ background-color: #2
 		<div class="lui-btn reg" onclick="reg(this)">注册</div>
 	</div>
 </div>
+<!-- 登录页 -->
+{include file="index/login" /}
 <script>
+$(document).ready(function(){
+ 	anchor_link_listen();
+});
+
+//页面事件监听
+function anchor_link_listen(){
+	if(!$.browser.mozilla){			
+		window.onpopstate = function(event){
+			console.log(window.location.hash);
+			switch(window.location.hash){
+			case "":
+				show_main();
+				break;
+			case "#reg":
+				show_reg();
+				break;
+			case "#login":
+				show_login();
+				break;
+			}		
+		}
+	}
+}
+
+//点击登录
+function login(obj){
+	if(is_ie()){
+		show_login();
+	}else{
+		window.location.href = '#login';
+	}	
+}
+
+//显示登录框
+function show_login(){
+	$lui.log('show_login');	
+	$('page#login').addClass('show');
+	setTimeout(function(){
+		$('page#login').addClass('background');		
+	},1);	
+
+	//清除数据
+	$('input[name="email"]').val('');
+	$('input[name="password"]').val('');	
+}
+
+//显示主屏幕
+function show_main(){
+	$('page').attr('class','');
+	//$('page:not(#main)').fadeOut();
+	$('page#main').attr('class','show');
+}
+
+function is_ie(){
+	if($.browser.mozilla){	
+		return true;
+	}else{
+		return false;
+	}
+}
+
 //注册js start -----------------------------------------------
 //获取验证码
 function get_code(obj){
 	$liu.btn_loading(obj); 
 } 
-function login(){
-	window.location.href = "{:url('user/login')}";
-}
+// function login(){
+// 	window.location.href = "{:url('user/login')}";
+// }
 
 function reg(obj){
 	$liu.btn_loaded(obj); 

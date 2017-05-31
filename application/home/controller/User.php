@@ -20,18 +20,22 @@ class User extends Common{
 
         $app_list = $AppModel -> getAppList($this -> uid);  //app项目列表
         $this -> assign('app_list',$app_list);              //视图参数
-       
+
         $is_me_app = false;
         foreach ($app_list as $key => $value) {
             if($value['id'] == $this -> app_id){
                 $is_me_app = true;
             }
         }
+
         if(!$is_me_app){
             if($app_list){
                 $this -> app_id = $app_list[0]['id'];
                 Session::set('app_id',$this -> app_id);
-            }            
+            }else{
+                Session::set('app_id',null);
+                $this -> app_id = 0;
+            }           
         }
 
         $nav = $NavModel -> getNav($this -> app_id);        //左边接口目录

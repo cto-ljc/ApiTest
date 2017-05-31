@@ -11,7 +11,7 @@
  Target Server Version : 50717
  File Encoding         : utf-8
 
- Date: 05/26/2017 16:33:12 PM
+ Date: 05/31/2017 18:04:54 PM
 */
 
 SET NAMES utf8mb4;
@@ -43,7 +43,14 @@ CREATE TABLE `api_api` (
   `url` varchar(255) DEFAULT '' COMMENT '相对路径',
   `sort` tinyint(4) DEFAULT '100' COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+--  Records of `api_api`
+-- ----------------------------
+BEGIN;
+INSERT INTO `api_api` VALUES ('55', '7', '32', '用户登录', '/user/login', '100');
+COMMIT;
 
 -- ----------------------------
 --  Table structure for `api_api_param`
@@ -61,7 +68,14 @@ CREATE TABLE `api_api_param` (
   `value` varchar(255) DEFAULT '' COMMENT '默认值',
   `sort` tinyint(4) DEFAULT '100' COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=147 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+--  Records of `api_api_param`
+-- ----------------------------
+BEGIN;
+INSERT INTO `api_api_param` VALUES ('145', '7', '32', '55', 'phone', 'phone', '1', 'normal', '', '100'), ('146', '7', '32', '55', 'password', 'password', '1', 'normal', '', '100');
+COMMIT;
 
 -- ----------------------------
 --  Table structure for `api_app`
@@ -77,7 +91,14 @@ CREATE TABLE `api_app` (
   `test_domain` varchar(255) DEFAULT '' COMMENT '测试域名',
   `sort` tinyint(4) DEFAULT '100' COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='项目列表';
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='项目列表';
+
+-- ----------------------------
+--  Records of `api_app`
+-- ----------------------------
+BEGIN;
+INSERT INTO `api_app` VALUES ('7', '1', '测试项目', '', '', 'http://test.com', 'http://test0.com', '100'), ('8', '1', '测试项目1', '', '', 'http://a.com', 'http://a.com', '100'), ('9', '1', '测试项目2', '', '', 'http://a.com', 'http://a.com', '100'), ('10', '1', '测试项目3', '', '', 'http://a.com', 'http://a.com', '100'), ('11', '1', '测试项目5', '', '', 'http://a.com', 'http://a.com', '100'), ('12', '1', '测试项目6', '', '', 'http://a.com', 'http://a.com', '100');
+COMMIT;
 
 -- ----------------------------
 --  Table structure for `api_layui_icon`
@@ -107,7 +128,14 @@ CREATE TABLE `api_nav_item` (
   `icon` varchar(16) DEFAULT NULL,
   `sort` tinyint(4) DEFAULT '100' COMMENT '排序',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+-- ----------------------------
+--  Records of `api_nav_item`
+-- ----------------------------
+BEGIN;
+INSERT INTO `api_nav_item` VALUES ('32', '7', '用户接口', 'xe612', '100'), ('33', '7', '通用接口', 'xe60f', '100');
+COMMIT;
 
 -- ----------------------------
 --  Table structure for `api_team`
@@ -138,14 +166,17 @@ CREATE TABLE `api_user` (
   `state` tinyint(4) NOT NULL DEFAULT '1' COMMENT '用户状态（0：禁用，1：正常）',
   `add_time` int(10) NOT NULL DEFAULT '0' COMMENT '添加时间',
   `del` tinyint(2) DEFAULT '0' COMMENT '删除状态（0：未删除，1已删除）',
+  `team_id` int(11) DEFAULT '0' COMMENT '团队id',
+  `rid` tinyint(4) DEFAULT '0' COMMENT '角色 1管理员 2普通用户',
+  `app_ids` varchar(255) DEFAULT '' COMMENT '允许访问的app',
   PRIMARY KEY (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 --  Records of `api_user`
 -- ----------------------------
 BEGIN;
-INSERT INTO `api_user` VALUES ('1', 'admin', 'b9677632c899fb35d12556c648e59200', '9ba2c', '0', '1473406751', '0'), ('6', 'lhc', '275209941296f9b711da5a6e262c9119', 'f58d7', '1', '1486457789', '0');
+INSERT INTO `api_user` VALUES ('1', 'admin', 'b9677632c899fb35d12556c648e59200', '9ba2c', '0', '1473406751', '0', '0', '1', '7,10,'), ('6', 'lhc', '275209941296f9b711da5a6e262c9119', 'f58d7', '1', '1486457789', '0', '0', '2', ''), ('7', 'cto-ljc@qq.com', 'c7200fcb522eff5146119d747aca9b6e', 'aebc9', '0', '1496210904', '0', '0', '2', '7,9,'), ('8', 'test', 'c7a516a255f59e440437d8dee1e44724', '20a66', '0', '1496214410', '0', '1', '2', '7,8,'), ('9', 'test2', '507dd998d8acb72d7aaa9e8d5370d19f', 'fcb17', '0', '1496222385', '0', '0', '2', '7,9,');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
