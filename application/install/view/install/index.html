@@ -1,0 +1,34 @@
+{extend name="public/base"/}
+
+{block name="header"}
+    <li class="active"><a href="javascript:;">安装协议</a></li>
+    <li><a href="javascript:;">环境检测</a></li>
+    <li><a href="javascript:;">创建数据库</a></li>
+    <li><a href="javascript:;">{eq name="Think.session.update" value="1"}升级{else/}安装{/eq}</a></li>
+    <li><a href="javascript:;">完成</a></li>
+{/block}
+
+{block name="body"}
+    <h1>api_test 1.0 刘剑超</h1>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+{/block}
+
+{block name="footer"}
+    <a class="btn btn-primary btn-large" href="{:url('step1')}">同意安装协议</a>
+    <a class="btn btn-large" onclick="window.location.href='about:blank'">不同意</a>
+
+<script type="text/javascript">
+function disagree(){
+    window.opener=null;window.open('','_self');window.close();
+}
+</script>
+{/block}

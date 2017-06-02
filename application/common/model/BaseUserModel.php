@@ -5,7 +5,7 @@ use think\Model;
 use think\Db;
 
 class BaseUserModel extends BaseModel{
-	private $sugar = 'xjklhq,ngmas'; 
+	private $sugar = ''; 
 
 	//得到盐
     protected function getSalt() {

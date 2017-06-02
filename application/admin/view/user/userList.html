@@ -45,7 +45,7 @@
             <tr>
                 <td>{$vo.uid}</td>
                 <td>{$vo.account}</td>                
-                <td>{:date('y-m-d',$vo.add_time)}</td>
+                <td>{:date('y-m-d',$vo.reg_time)}</td>
                 <td class="td-status">
                     {switch name="vo.state"}
                         {case value="0"}
@@ -87,7 +87,7 @@
     <div id="page"></div>
 </div>
 <script>
-layui.use(['form','laydate','element','laypage','layer'], function(){
+layui.use(['form','layer'], function(){
     // $ = layui.jquery;//jquery
     // laydate = layui.laydate;//日期插件
     // lement = layui.element();//面包导航
