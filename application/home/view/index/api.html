@@ -19,11 +19,12 @@ page.behind{ z-index: -1; }
 header{ height: 50px; background-color: #114e4e; }
 header .api_logo{display: inline-block;  font-size: 25px;  color: white;  padding: 10px 15px;}
 header .login{ float: right; height: 50px; color: #fff; padding: 0; }
-header .login span{ padding: 14px 10px; font-size: 16px; display: inline-block; height: 22px;}
-header .login span:active,header .login span:hover{color:aliceblue;}
+header .login span{ padding: 14px 10px; font-size: 16px; display: inline-block; height: 22px; }
+/*header .login span:active,header .login span:hover{color:aliceblue;}*/
 header .login span.reg{ padding: 14px 18px; background-color: #1ec9d2;}
-header .login span.reg:active,header .login span.reg:hover{ background-color: #2edbe4; color:#fff;  },
-
+header .login span.reg:active,header .login span.reg:hover{ background-color: #2edbe4; color:#fff; }
+header .login span.login-btn:hover{color:aliceblue; background-color: #2eb6bd;	}
+header .login span.login-btn:active{background-color: #2edbe4;	}
 
 .layui-tab-content{ margin: auto; min-width: 500px; }
 #TabSize{ width: 50px; margin: 0 5px; }
@@ -57,14 +58,15 @@ header .login span.reg:active,header .login span.reg:hover{ background-color: #2
 .reg_block > div .reg:active{ background-color: #0d6760; }
 
 
+
+
 </style>
 <page class="show" id="main">
 <header>
 	<div class="list">
 		<div class="api_logo">API-test</div>
 		<div class="login">
-			<span class="api-btn" onclick="login()">登陆</span>
-			<span class="api-btn reg" onclick="reg()">注册</span>
+			<span class="api-btn login-btn lui-btn" onclick="login()">登陆</span>			
 		</div>
 	</div>
 </header>
@@ -168,20 +170,6 @@ header .login span.reg:active,header .login span.reg:hover{ background-color: #2
 	</div>
 </div>
 </page>
-
-<div class="reg_block">
-	<div>
-		<i class="layui-icon close lui-btn" >&#x1006;</i>  
-		<div class="header">
-			<span class="title">用户注册</span>			
-		</div>
-		<input type="text" name="account">
-		<input type="password" name="password">
-		<input type="text" name="code">
-		<div class="lui-btn get_code" onclick="get_code(this)">获取短信</div>
-		<div class="lui-btn reg" onclick="reg(this)">注册</div>
-	</div>
-</div>
 <!-- 登录页 -->
 {include file="index/login" /}
 <script>
@@ -218,18 +206,6 @@ function login(obj){
 	}	
 }
 
-//显示登录框
-function show_login(){
-	$lui.log('show_login');	
-	$('page#login').addClass('show');
-	setTimeout(function(){
-		$('page#login').addClass('background');		
-	},1);	
-
-	//清除数据
-	$('input[name="email"]').val('');
-	$('input[name="password"]').val('');	
-}
 
 //显示主屏幕
 function show_main(){
@@ -245,21 +221,6 @@ function is_ie(){
 		return false;
 	}
 }
-
-//注册js start -----------------------------------------------
-//获取验证码
-function get_code(obj){
-	$liu.btn_loading(obj); 
-} 
-// function login(){
-// 	window.location.href = "{:url('user/login')}";
-// }
-
-function reg(obj){
-	$liu.btn_loaded(obj); 
-	//window.location.href = "{:url('user/reg')}";
-}
-//注册js end -----------------------------------------------------
 
 //添加参数
 function add_param(obj){

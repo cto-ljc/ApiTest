@@ -48,7 +48,7 @@ page#login .content-block .login-button:active{ background-color: #5b6977; }
 		<div class="item code">
 			<span class="code">验证码：</span>
 			<input class="imput" type="text" name="code" autocomplete="off">		
-			<div class="get_code lui-btn" onclick="get_code(this,'login')">获取验证码</div>
+			<div class="get_code lui-btn" onclick="get_code(this)">{:captcha_img()}</div>
 		</div>
 		<div class="item">
 			<div class="login-button lui-btn" onclick="login_submit(this)">登录</div>		
@@ -58,6 +58,26 @@ page#login .content-block .login-button:active{ background-color: #5b6977; }
 
 <script>
 // 登录--------------------------------------------------------
+
+//显示登录框
+function show_login(){
+	$lui.log('show_login');	
+	$('page#login').addClass('show');
+	setTimeout(function(){
+		$('page#login').addClass('background');		
+	},1);	
+
+	//清除数据
+	$('input[name="email"]').val('');
+	$('input[name="password"]').val('');	
+
+	var password_error = localStorage.getItem('password_error');
+
+	if(password_error == 'true'){
+		$('page#login').addClass('show_code');		
+	}
+}
+
 function close_login_page(){
 	if(is_ie()){
 		show_main();
@@ -65,6 +85,11 @@ function close_login_page(){
 		history.back(-1);
 	}
 }
+
+function get_code(obj){
+	
+} 
+
 function login_submit(obj){
 	if($(obj).attr('active') == 'false'){
 		return;
@@ -108,10 +133,11 @@ function login_submit(obj){
 	    			time: 1000
 	    		},function(){
 	    			var url = "{:url('User/main')}";
-	    			
+	    			localStorage.setItem('password_error','false');
 	    			window.location = url;
 	    		});  
 	    	}else{
+	    		localStorage.setItem('password_error','true');
 	    		$('page#login').addClass('show_code');
 	    		layer.msg(ret.msg);  
 	    	}	           
