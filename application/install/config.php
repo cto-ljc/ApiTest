@@ -27,6 +27,9 @@ return array(
     // 默认操作名
     'default_action'         => 'index',
 
+    // URL普通方式参数 用于自动生成
+    'url_common_param'       => true,
+
     'template'               => [
         // 模板引擎类型 支持 php think 支持扩展
         'type'         => 'Think',

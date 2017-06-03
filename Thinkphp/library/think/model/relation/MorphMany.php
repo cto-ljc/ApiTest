@@ -129,7 +129,7 @@ class MorphMany extends Relation
                     $relationModel->setParent(clone $result);
                     $relationModel->isUpdate(true);
                 }
-                $result->setAttr($attr, $this->resultSetBuild($data[$result->$pk]));
+                $result->setRelation($attr, $this->resultSetBuild($data[$result->$pk]));
             }
         }
     }
@@ -152,12 +152,16 @@ class MorphMany extends Relation
                 $this->morphType => $this->type,
             ], $relation, $subRelation, $closure);
 
+            if (!isset($data[$result->$pk])) {
+                $data[$result->$pk] = [];
+            }
+
             foreach ($data[$result->$pk] as &$relationModel) {
                 $relationModel->setParent(clone $result);
                 $relationModel->isUpdate(true);
             }
 
-            $result->setAttr(Loader::parseName($relation), $this->resultSetBuild($data[$result->$pk]));
+            $result->setRelation(Loader::parseName($relation), $this->resultSetBuild($data[$result->$pk]));
         }
     }
 
@@ -269,7 +273,7 @@ class MorphMany extends Relation
      */
     protected function baseQuery()
     {
-        if (empty($this->baseQuery)) {
+        if (empty($this->baseQuery) && $this->parent->getData()) {
             $pk                    = $this->parent->getPk();
             $map[$this->morphKey]  = $this->parent->$pk;
             $map[$this->morphType] = $this->type;

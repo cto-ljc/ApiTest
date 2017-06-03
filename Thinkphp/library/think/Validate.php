@@ -165,7 +165,7 @@ class Validate
     }
 
     /**
-     * 获取验证规则的默认提示信息
+     * 设置验证规则的默认提示信息
      * @access protected
      * @param string|array  $type  验证规则类型名称或者数组
      * @param string        $msg  验证提示信息
@@ -1194,12 +1194,14 @@ class Validate
      */
     protected function getDataValue($data, $key)
     {
-        if (strpos($key, '.')) {
+        if (is_numeric($key)) {
+            $value = $key;
+        } elseif (strpos($key, '.')) {
             // 支持二维数组验证
             list($name1, $name2) = explode('.', $key);
             $value               = isset($data[$name1][$name2]) ? $data[$name1][$name2] : null;
         } else {
-            $value = is_numeric($key) ? $key : (isset($data[$key]) ? $data[$key] : null);
+            $value = isset($data[$key]) ? $data[$key] : null;
         }
         return $value;
     }

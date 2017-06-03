@@ -129,7 +129,7 @@ class MorphOne extends Relation
                     $relationModel->isUpdate(true);
                 }
 
-                $result->setAttr($attr, $relationModel);
+                $result->setRelation($attr, $relationModel);
             }
         }
     }
@@ -161,7 +161,7 @@ class MorphOne extends Relation
                 $relationModel = null;
             }
 
-            $result->setAttr(Loader::parseName($relation), $relationModel);
+            $result->setRelation(Loader::parseName($relation), $relationModel);
         }
     }
 
@@ -217,7 +217,7 @@ class MorphOne extends Relation
      */
     protected function baseQuery()
     {
-        if (empty($this->baseQuery)) {
+        if (empty($this->baseQuery) && $this->parent->getData()) {
             $pk                    = $this->parent->getPk();
             $map[$this->morphKey]  = $this->parent->$pk;
             $map[$this->morphType] = $this->type;

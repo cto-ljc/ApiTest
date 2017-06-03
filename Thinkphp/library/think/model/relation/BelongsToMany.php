@@ -121,7 +121,7 @@ class BelongsToMany extends Relation
     public function getRelation($subRelation = '', $closure = null)
     {
         if ($closure) {
-            call_user_func_array($closure, [& $this->query]);
+            call_user_func_array($closure, [ & $this->query]);
         }
         $result = $this->buildQuery()->relation($subRelation)->select();
         $this->hydratePivot($result);
@@ -162,7 +162,9 @@ class BelongsToMany extends Relation
     public function find($data = null)
     {
         $result = $this->buildQuery()->find($data);
-        $this->hydratePivot([$result]);
+        if ($result) {
+            $this->hydratePivot([$result]);
+        }
         return $result;
     }
 
@@ -267,7 +269,7 @@ class BelongsToMany extends Relation
                     $data[$result->$pk] = [];
                 }
 
-                $result->setAttr($attr, $this->resultSetBuild($data[$result->$pk]));
+                $result->setRelation($attr, $this->resultSetBuild($data[$result->$pk]));
             }
         }
     }
@@ -293,7 +295,7 @@ class BelongsToMany extends Relation
             if (!isset($data[$pk])) {
                 $data[$pk] = [];
             }
-            $result->setAttr(Loader::parseName($relation), $this->resultSetBuild($data[$pk]));
+            $result->setRelation(Loader::parseName($relation), $this->resultSetBuild($data[$pk]));
         }
     }
 
@@ -376,7 +378,9 @@ class BelongsToMany extends Relation
         // 关联查询封装
         $tableName = $this->query->getTable();
         $table     = $this->pivot->getTable();
-        $query     = $this->query->field($tableName . '.*')
+        $fields    = $this->getQueryFields($tableName);
+
+        $query = $this->query->field($fields)
             ->field(true, false, $table, 'pivot', 'pivot__');
 
         if (empty($this->baseQuery)) {
@@ -514,7 +518,7 @@ class BelongsToMany extends Relation
         $changes = [
             'attached' => [],
             'detached' => [],
-            'updated'  => []
+            'updated'  => [],
         ];
         $pk      = $this->parent->getPk();
         $current = $this->pivot->where($this->localKey, $this->parent->$pk)
@@ -559,7 +563,7 @@ class BelongsToMany extends Relation
      */
     protected function baseQuery()
     {
-        if (empty($this->baseQuery)) {
+        if (empty($this->baseQuery) && $this->parent->getData()) {
             $pk    = $this->parent->getPk();
             $table = $this->pivot->getTable();
             $this->query->join($table . ' pivot', 'pivot.' . $this->foreignKey . '=' . $this->query->getTable() . '.' . $this->query->getPk())->where('pivot.' . $this->localKey, $this->parent->$pk);
