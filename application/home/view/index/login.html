@@ -25,6 +25,7 @@ page#login .content-block .item > span.code{ position: absolute; left: 10px; dis
 page#login .content-block .get_code{ position: absolute; left: 300px; border-radius: 30px; border:1px solid #ccc; -moz-box-sizing: border-box;  box-sizing: border-box; height: 34px; line-height: 33px; color: #fff; width: 100px; text-align: center;}
 page#login.show_code .content-block .get_code:hover{ background-color: #687888; }
 page#login.show_code .content-block .get_code:active{ background-color: #5b6977; }
+page#login.show_code .content-block .get_code img{ height: 34px;  width: 100px;  border-radius: 37px; }
 
 page#login .content-block .login-button{ position: absolute; width: 100%; text-align: center; color: #fff; border: 1px solid #ccc; line-height: 34px; border-radius: 30px; }
 page#login .content-block .login-button.active{ background-color: darkslateblue; border: 1px solid darkslateblue; }
@@ -32,7 +33,7 @@ page#login .content-block .login-button:hover{ background-color: #687888; }
 page#login .content-block .login-button:active{ background-color: #5b6977; }
 
 </style>
-<page class="" id="login">
+<page class="{$show_code}" id="login">
 	<div class="content-block">	
 		<div class="title">用户登录</div>
 		<i class="layui-icon close lui-btn close_page" onclick="close_login_page()" >&#x1006;</i> 
@@ -71,11 +72,11 @@ function show_login(){
 	$('input[name="email"]').val('');
 	$('input[name="password"]').val('');	
 
-	var password_error = localStorage.getItem('password_error');
+	// var password_error = localStorage.getItem('password_error');
 
-	if(password_error == 'true'){
-		$('page#login').addClass('show_code');		
-	}
+	// if(password_error == 'true'){
+	// 	$('page#login').addClass('show_code');		
+	// }
 }
 
 function close_login_page(){
@@ -87,7 +88,9 @@ function close_login_page(){
 }
 
 function get_code(obj){
-	
+	var url = "{:captcha_src()}";
+	console.log(url);
+	$(obj).find('img').attr('src',url);
 } 
 
 function login_submit(obj){
@@ -111,8 +114,8 @@ function login_submit(obj){
 		return;
 	}
 
-	if($('page#login').hasClass('show_code') && code.length != 6){
-		layer.msg('请输入6位验证码');	
+	if($('page#login').hasClass('show_code') && code.length != 4){
+		layer.msg('请输入4位验证码');	
 		return;
 	}
 	
@@ -139,6 +142,7 @@ function login_submit(obj){
 	    	}else{
 	    		localStorage.setItem('password_error','true');
 	    		$('page#login').addClass('show_code');
+	    		get_code($('.get_code'));
 	    		layer.msg(ret.msg);  
 	    	}	           
 	    },

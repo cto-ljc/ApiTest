@@ -34,10 +34,16 @@ class Login extends \think\Controller{
             $account = input('post.email');
             $password = input('post.password');
 
+            $code = input('post.code');     
+
+            
+
             $UserModel = Loader::model('UserModel');                      //实例化模型
-            if($user_info = $UserModel -> login($account,$password)){
+            if($user_info = $UserModel -> login($account,$password,$code)){
+                cache('captcha'.request() -> ip(),NULL);
                 json_success('成功');
             }else{
+                cache('captcha'.request() -> ip(),true,60*60*24);
                 json_error($UserModel -> getError());
             }       
         }    

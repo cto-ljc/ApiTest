@@ -11,7 +11,7 @@
  Target Server Version : 50717
  File Encoding         : utf-8
 
- Date: 06/02/2017 14:44:14 PM
+ Date: 06/05/2017 11:03:52 AM
 */
 
 SET NAMES utf8mb4;
@@ -130,6 +130,7 @@ CREATE TABLE `api_user` (
   `del` tinyint(2) DEFAULT '0' COMMENT '删除状态（0：未删除，1已删除）',
   `team_id` int(11) DEFAULT '0' COMMENT '团队id',
   `rid` tinyint(4) DEFAULT '0' COMMENT '角色 1管理员 2普通用户',
+  `error_count` tinyint(4) DEFAULT '0' COMMENT '密码错误次数',
   `app_ids` varchar(255) DEFAULT '' COMMENT '允许访问的app',
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;

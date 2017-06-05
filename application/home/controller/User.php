@@ -13,7 +13,7 @@ class User extends Common{
     /*
      * 主框架
      */
-    public function main(){      
+    public function main(){    
         $NavModel = Loader::model('NavModel');              //实例化模型
         $AppModel = Loader::model('AppModel');              //实例化模型
        

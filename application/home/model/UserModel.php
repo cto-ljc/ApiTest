@@ -16,7 +16,7 @@ class UserModel extends BaseUserModel{
      * @param string $account 账号
      * @param string $password 密码
      */
-    public function login($account,$password){
+    public function login($account,$password,$code){
     	$map['account'] = $account;    	
 
     	if(!$user_info = db('user') -> where($map) -> find()){
@@ -24,12 +24,24 @@ class UserModel extends BaseUserModel{
     		return false;
     	}
 
+        if((cache('captcha'.request() -> ip()) || $user_info['error_count'] != 0) && !captcha_check($code)){
+            $this -> error = '验证码错误';
+            return false;
+        }
+
         $uid = $user_info['uid'];    	
 
         if($user_info['password'] != $this -> encodePWD($password,$user_info['salt'])){
             $this -> error = '账号或密码错误';
+            db('user') -> where($map) -> setInc('error_count');;
             return false;
         }
+
+        //更新登录信息
+        $update_data['error_count'] = 0;
+        $update_data['login_ip'] = request() -> ip();
+        $update_data['login_time'] = time();
+        db('user') -> where($map) -> update($update_data);        
 
         Session::set('uid',$uid);     //session保存用户uid
 

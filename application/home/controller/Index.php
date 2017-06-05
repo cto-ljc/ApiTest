@@ -14,6 +14,13 @@ class Index extends \think\Controller{
     //api测试页
     public function api(){ 
         $this -> assign('title','api测试');
+        if(cache('captcha'.request() -> ip())){
+            $show_code = 'show_code';
+        }else{
+            $show_code = '';
+        }
+        
+        $this -> assign('show_code',$show_code);
         return view(); 
     }
 
