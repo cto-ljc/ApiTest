@@ -23,7 +23,6 @@ class App extends Common{
 			$data['domain'] = input('post.domain');
 			$data['test_domain'] = input('post.test_domain');
 			$data['sort'] = input('post.sort');
-			$data['team_id'] = db('team') -> where(array('uid' => $this -> uid)) -> value('id');
 			
 			$AppModel = Loader::model('AppModel');                      //实例化模型
 			if($AppModel -> addApp($data) !== false){
