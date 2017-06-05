@@ -123,12 +123,16 @@ function navList(title,url,w,h){
 
 /*添加*/
 function add_api(title,url,w,h){
-    x_admin_show(title,url,w,h);
+    x_admin_show(title,url,w,h,function(){
+        location.reload();
+    });
 }
 
 /*编辑*/ 
 function edit_api (title,url,id,w,h) {
-    x_admin_show(title,url,w,h); 
+    x_admin_show(title,url,w,h,function(){
+        location.reload();
+    }); 
 }
 
 /*删除api*/
