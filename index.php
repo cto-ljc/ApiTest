@@ -1,7 +1,7 @@
 <?php
 	// [ 应用入口文件 ]	
 	if(!is_file(__DIR__ . '/config/database.php')){
-        $url = 'http://'. $_SERVER['SERVER_NAME'] . rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/').'/install.php';       
+        $url = 'http://'. $_SERVER['SERVER_NAME'] . rtrim(rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/'),'\\').'/install.php';       
         header('Location:'.$url );exit();
     }
 
