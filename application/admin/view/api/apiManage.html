@@ -1,26 +1,21 @@
+
 <style>
 .app{  }
 .right{ float: right; margin-left: 10px; }
-.xblock{ height: 38px;}
+.layui-tab{ position: relative; }
+.nav_manage{ position: absolute; top: 1px; right: 2px; }
 .api-nav{ background-color: #000; }
 .layui-table th.handle,.handle{width:100px; float:right; text-align: right;}
 .layui-tab-content .layui-tab-item .nav{    height: 30px;  line-height: 30px;  padding-right:5px;  }
 </style>
-<div class="x-nav">
-    <span class="layui-breadcrumb">
-      <a><cite>首页</cite></a>
-      <a><cite>项目管理</cite></a>
-      <a><cite>api管理</cite></a>
-    </span>
-    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
-</div>
-<div class="x-body">
+
+<div class="layui-tab-content">
     <xblock>
         <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
-        <form class="layui-inline layui-form layui-form-pane1" action="">
+        <form class="layui-form " action="">
             <div class="layui-inline">
                 <select name="app" lay-filter="app">
-                    <option value="">请选项目</option>
+                    <option value="">项目列表</option>                       
                     {volist name="app_list" id="vo"}
                         {if condition="$vo.id eq $app_id"}
                             <option value="{$vo.id}" selected>{$vo.name}</option>
@@ -30,32 +25,29 @@
                     {/volist}                    
                 </select>
             </div>
+            <div class="layui-inline">
+                <div class="layui-btn" onclick="navList('分类管理','{:url('App/appList',array('app_id' => $app_id))}','800','600')">项目管理</div>
+            </div>
         </form>
-        {if condition="$app_id neq 0"}
-            <button class="layui-btn right" onclick="navList('分类管理','{:url('ApiNav/navList',array('app_id' => $app_id))}','800','600')"><i class="layui-icon">&#xe608;</i> 分类管理</button>
-        {/if} 
+        
     </xblock>
     {notempty name="api_data"}
-    <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="demo">
+    <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="api_nav">
         <ul class="layui-tab-title">            
             {volist name="api_data" id="vo" key='key'}
                 {if condition="$key eq 1"}
-                    <li class="layui-this"><i class="layui-icon">{$vo.icon}</i>{$vo.name}</li> 
+                    <li class="layui-this" lay-id="{$vo.id}">{$vo.name}</li> 
                 {else /}
-                    <li><i class="layui-icon">{$vo.icon}</i> {$vo.name}</li> 
+                    <li lay-id="{$vo.id}">{$vo.name}</li> 
                 {/if}                          
-            {/volist}            
+            {/volist}     
+            
         </ul>
+        {if condition="$app_id neq 0"}
+            <button class="layui-btn right nav_manage" onclick="navList('分类管理','{:url('ApiNav/navList',array('app_id' => $app_id))}','800','600')"><i class="layui-icon">&#xe608;</i> 分类管理</button>
+        {/if} 
         <div class="layui-tab-content" style="padding: 10px;">
             {volist name="api_data" id="vo" key='key'}
-                <!-- {if condition="$key eq 1"}
-                    <div class="layui-tab-item layui-show">
-                        在这里，你将以最直观的形式体验Layui！在编辑器中可以执行layui相关的一切代码。
-                        <br>你也可以点击左侧导航针对性地试验我们提供的示例。                
-                    </div> 
-                {else /}
-                    <div class="layui-tab-item">{$vo.name}内容</div>
-                {/if}   -->                   
                 <div class="layui-tab-item {if condition='$key eq 1'}layui-show{/if}">                    
                     <div class="nav">
                         <button class="layui-btn layui-btn-mini" onclick="add_api('添加接口','{:url(\'addApi\',array(\'nav_id\' => $vo.id) )}','900','500')">添加接口</button>
@@ -89,7 +81,7 @@
                         </tbody>
                     </table>
                 </div>     
-            {/volist}   
+            {/volist}              
         </div>
     </div>   
     {/notempty}
@@ -105,6 +97,7 @@ layui.use(['form','laydate','element','laypage','layer'], function(){
     // laypage = layui.laypage;//分页
     // layer = layui.layer;//弹出层
     var form = layui.form();
+    var element = layui.element();
 
     //以上模块根据需要引入
     form.on('select(app)', function(data){        
@@ -112,27 +105,66 @@ layui.use(['form','laydate','element','laypage','layer'], function(){
         var url = "{:url('','','')}"+'/app_id/'+app_id;        
         window.location.href = url;
     });
+
+    var layid = location.hash.replace(/^#api_nav=/, '');
+    element.tabChange('api_nav', layid); //假设当前地址为：http://a.com#api_nav=222，那么选项卡会自动切换到“发送消息”这一项
+
+    element.on('tab(api_nav)', function(elem){
+        var layid = this.getAttribute('lay-id');
+
+        location.hash = 'api_nav='+ layid;
+    });
 });
 
 /*添加*/
 function navList(title,url,w,h){
-    x_admin_show(title,url,w,h,function(){
-        location.reload();
-    });
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url,
+        end: function(){
+            location.reload();
+        }
+    });        
 }
 
 /*添加*/
 function add_api(title,url,w,h){
-    x_admin_show(title,url,w,h,function(){
-        location.reload();
-    });
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url,
+        end: function(){
+            location.reload();
+        }
+    });        
 }
 
 /*编辑*/ 
 function edit_api (title,url,id,w,h) {
-    x_admin_show(title,url,w,h,function(){
-        location.reload();
-    }); 
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url,
+        end: function(){
+            location.reload();
+        }
+    });     
 }
 
 /*删除api*/

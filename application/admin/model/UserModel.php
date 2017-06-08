@@ -59,14 +59,14 @@ class UserModel extends BaseUserModel{
 
 
     //用户列表
-    public function userList($page = 1,$size = 10,$state = 0){
+    public function userList($page = 1,$size = 10,$state = false){
         $map = array();
-        if($state !== 0){
+        if($state !== false){
             $map['state'] = $state;
         }
         $list = Db::name('user') -> where($map) -> page($page,$size) -> select();
         $total = Db::name('user') -> where($map) -> count();
-
+       
         $data['list'] = $list;
         $data['total'] = $total;
 

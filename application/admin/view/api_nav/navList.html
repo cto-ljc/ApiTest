@@ -1,4 +1,4 @@
-
+{load href="__STATIC__/X-admin/css/x-admin.css" /} 
 <!-- <div class="x-nav">
     <span class="layui-breadcrumb">
       <a><cite>首页</cite></a>
@@ -19,9 +19,7 @@
             <tr>
                 <th><input type="checkbox" name="" value=""></th>
                 <th>ID</th>
-                <!-- <th>logo</th> -->
                 <th>名称</th>
-                <th>图标</th>
                 <th>排序</th>
                 <th>api列表</th>
                 <th>操作</th>
@@ -32,16 +30,10 @@
             <tr>
                 <td><input type="checkbox" value="1" name=""></td>
                 <td>{$vo['id']}</td>
-                <!-- <td><img src="./images/banner.png" width="200" alt=""></td> -->
-                <td >{$vo.name}</td>                
-                <td ><i class="layui-icon">{$vo.icon}</i></td>
+                <td >{$vo.name}</td>
                 <td>{$vo.sort}</td>
                 <td>
-                    <div class="layui-btn layui-btn-mini layui-btn-primary">查看</div>
-                   <!--  <a title="api列表" href="javascript:;" onclick="api_list(this,{$vo.id})" 
-                    style="text-decoration:none">
-                        <i class="layui-icon">&#xe60f;</i>
-                    </a> -->
+                    <div class="layui-btn layui-btn-mini layui-btn-primary">查看</div>                   
                 </td>
                 <td class="td-manage">                    
                     
@@ -88,12 +80,30 @@ layui.use(['form','laydate','element','laypage','layer'], function(){
  }
  /*添加*/
 function add(title,url,w,h){
-    x_admin_show(title,url,w,h);
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url        
+    });        
 }
 
 // 编辑
 function edit (title,url,id,w,h) {
-    x_admin_show(title,url,w,h); 
+    layer.open({
+        type: 2,
+        area: [w+'px', h +'px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: title,
+        content: url        
+    });    
 }
 /*删除*/
 function del(obj,id){

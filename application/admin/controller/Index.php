@@ -19,15 +19,6 @@ class Index extends Common
     	return view();
     }
 
-   public function main_x(){
-        //用户信息
-        $UserModel = Loader::model('UserModel');                      //实例化模型
-        $user_info = $UserModel -> userInfo($this -> uid);
-        $this -> assign('user_info',$user_info);
-
-        return view();
-    }
-
     public function logout(){
         session('admin_uid',null);
         $this->redirect('admin/login/login');
