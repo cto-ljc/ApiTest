@@ -17,7 +17,7 @@
 	define('CONF_PATH', __DIR__.'/config/');
 
 	// 加载框架引导文件
-	require __DIR__ . '/thinkphp/start.php';
+	require __DIR__ . '/Thinkphp/start.php';
 	
 	//header("Location: http://". $_SERVER['SERVER_NAME'] . rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/').'/public' );exit();
 ?>
