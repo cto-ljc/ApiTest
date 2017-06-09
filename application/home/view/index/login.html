@@ -40,15 +40,15 @@ page#login .content-block .login-button:active{ background-color: #5b6977; }
 
 		<div class="item">
 			<span class="email">邮箱：</span>	
-			<input class="imput" type="text" name="email" value="" autocomplete="off">			
+			<input class="input" type="text" name="email" value="" autocomplete="off">			
 		</div>
 		<div class="item">
 			<span class="pwd">密码：</span>
- 			<input class="imput" type="password" name="password" autocomplete="off">
+ 			<input class="input" type="password" name="password" autocomplete="off">
 		</div>
 		<div class="item code">
 			<span class="code">验证码：</span>
-			<input class="imput" type="text" name="code" autocomplete="off">		
+			<input class="input" type="text" name="code" autocomplete="off">		
 			<div class="get_code lui-btn" onclick="get_code(this)">{:captcha_img()}</div>
 		</div>
 		<div class="item">
@@ -78,6 +78,14 @@ function show_login(){
 	// 	$('page#login').addClass('show_code');		
 	// }
 }
+
+//监听回车键
+$('page#login input').keydown(function(e){
+	if(e.keyCode==13){
+		console.log('asdas');
+		$('page#login .login-button').click(); //处理事件
+	}
+});
 
 function close_login_page(){
 	if(is_ie()){

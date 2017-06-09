@@ -14,7 +14,7 @@ class Common extends \think\Controller{
 
         $this -> checkOnline();
 
-        $this -> assign('title',Request::instance() -> action());       
+        $this -> assign('title',Request::instance() -> action());             
     }
 
     protected function checkOnline(){        

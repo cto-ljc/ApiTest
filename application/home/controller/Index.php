@@ -13,7 +13,7 @@ class Index extends \think\Controller{
 
     //api测试页
     public function api(){ 
-        $this -> assign('title','api测试');
+        $this -> assign('title','API测试系统');
         if(cache('captcha'.request() -> ip())){
             $show_code = 'show_code';
         }else{

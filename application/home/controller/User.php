@@ -50,7 +50,7 @@ class User extends Common{
 
         $this -> assign('user_info',$user_info);
         
-        $this -> assign('title','APItest');
+        $this -> assign('title','API测试系统');
     	return view();                                      //渲染视图
     }
 
