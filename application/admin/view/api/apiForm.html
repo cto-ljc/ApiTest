@@ -323,7 +323,7 @@ function add_param(obj){
   	});	
 }
 
-layui.use('form', function(){	
+layui.use(['form','element'], function(){	
 	//修改参数时 将参数行设置为修改状态
 	$("#param_table tr.param input,#param_table tr.param select").change(function(){
     	$(this).parents('tr.param').addClass('update_param');

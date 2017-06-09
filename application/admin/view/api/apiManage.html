@@ -31,7 +31,7 @@
         </form>
         
     </xblock>
-    {notempty name="api_data"}
+    
     <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="api_nav">
         <ul class="layui-tab-title">            
             {volist name="api_data" id="vo" key='key'}
@@ -84,7 +84,7 @@
             {/volist}              
         </div>
     </div>   
-    {/notempty}
+    
     <div id="page"></div>
 </div>
 

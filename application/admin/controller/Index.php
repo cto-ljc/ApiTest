@@ -27,4 +27,9 @@ class Index extends Common
     public function welcome(){
     	
     }
+
+    //帮助页面
+    public function help(){
+        return view();
+    }
 }
