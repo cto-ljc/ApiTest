@@ -1,3 +1,53 @@
+//添加body里面的tab
+function tabAdd(elem){
+    var element = layui.element();
+
+    title = elem.find('cite').text();
+    url = elem.find('a').attr('_href');
+    id = elem.find('cite').text();
+    
+    console.log(url);
+
+    if($('.layui-tab-title li#'+id).length){    //如果不存在该选项卡 则创建 否则切换            
+        var index = $(".layui-tab-title li").index($('.layui-tab-title li#'+id));
+        element.tabDelete('frame-tab', id);  
+    }
+
+    res = element.tabAdd('frame-tab', {
+        title: title
+        ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
+        id:id
+    });
+
+    element.tabChange('frame-tab', $('.layui-tab-title li').length-1);
+
+    var length = $('.layui-tab-title li').length;
+    $('.layui-tab-title li').eq(length - 1).attr('id',id);  
+    
+    element.tabChange('frame-tab', id);   
+}
+
+//初始化侧边栏
+function init_side(){
+    var side = location.hash.replace(/^#/, '');
+    side = side.replace("#","");
+    side = side.split("/"); 
+    var item_id = side[0];
+    var child_id = side[1];
+    if(!(item_id && child_id)){
+        return;
+    }    
+
+    $('.layui-side .layui-nav li').removeClass('layui-nav-itemed');
+    $('.layui-side .layui-nav li[item-id="'+item_id+'"]').addClass('layui-nav-itemed');
+    $('.layui-side .layui-nav li dd').removeClass('layui-this');
+    $('.layui-side .layui-nav li[item-id="'+item_id+'"] dd[child-id="'+child_id+'"]').addClass('layui-this');
+    $('.layui-side .layui-nav li[item-id="'+item_id+'"] dd[child-id="'+child_id+'"] a').click();
+    
+    var elem = $('.layui-side .layui-nav li[item-id="'+item_id+'"] dd[child-id="'+child_id+'"]');
+    tabAdd(elem);
+}
+
 //ajax请求
 function post(data,url,callback){
 	url = url == undefined  ?  location.href : url;

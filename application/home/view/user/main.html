@@ -1,6 +1,19 @@
 <style>
-.header .left{ left: 0; right:inherit !important; }
+.header .layui-nav.left{ float: left;     padding: 0;}
 .header .layui-nav .layui-nav-item{ height: 60px; }
+
+.layui-header.header{ background-color: #393d49; border-bottom: 1px solid #009e94;}
+.header .layui-nav{ float: right; }
+.header .logo{ position: absolute; left: 0; color: #c2c2c2; height: 60px; line-height: 60px; padding: 0 20px; font-size: 20px; }
+.header .logo:hover{ color: #efefef; }
+
+.layui-layout-admin .layui-body{ bottom: 0; }
+.layui-body .frame{ position: absolute;  left: 0;  right: 0;  top: 41px;  bottom: 0; }
+.layui-body .layui-tab{ margin: 0; position: absolute;  left: 0;  right: 0;  top: 0px;  bottom: 0;}
+.layui-body .layui-tab .site-demo{ position: absolute;  left: 0;  right: 0;  top: 41px;  bottom: 0; }
+.layui-body .layui-tab .layui-tab-content{ padding: 0; }
+.layui-body .layui-tab .layui-tab-content .layui-tab-item{ height: 100%; }
+.layui-body .layui-tab .layui-tab-content .layui-tab-item iframe{ width: 100%; height: 100%; }
 </style>
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header header header-demo">
@@ -40,22 +53,20 @@
             </ul>
         </div>
     </div>
-    <div class="layui-side layui-bg-black">
+   <div class="layui-side layui-bg-black">
         <div class="layui-side-scroll">
             <ul class="layui-nav layui-nav-tree site-demo-nav" lay-filter="side">
                 {volist name="nav" id="vo"}
-                <li class="layui-nav-item">
+                <li class="layui-nav-item"  item-id="{$vo['id']}">
                     <a class="javascript:;" href="javascript:;">
                         <cite>{$vo['name']}</cite>
                     </a>
-                    <dl class="layui-nav-child">
+                    <dl class="layui-nav-child" >
                     {volist name="vo['child']" id="v"}
-                        <dd class="">
-                            <dd class="">
-                                <a href="javascript:;" _href="{:url('home/user/api',array('api_id' => $v['id']))}">
-                                    <cite>{$v['name']}</cite>
-                                </a>
-                            </dd>
+                        <dd class="" item-id="{$vo['id']}" child-id="{$v['id']}">
+                            <a href="javascript:;" _href="{:url('home/user/api',array('api_id' => $v['id']))}">
+                                <cite>{$v['name']}</cite>
+                            </a>
                         </dd>
                     {/volist}
                     </dl>
@@ -66,15 +77,17 @@
             </ul>
         </div>
     </div>
-    <div class="layui-tab layui-tab-card site-demo-title" lay-filter="x-tab" lay-allowclose="true">
-        <ul class="layui-tab-title">
-            <li class="layui-this">
-                我的桌面
-            </li>
-        </ul>
-        <div class="layui-tab-content site-demo site-demo-body">
-            <div class="layui-tab-item layui-show">
-                <iframe frameborder="0" src="{:url('welcome')}" class="x-iframe"></iframe>
+     <div class="layui-body site-demo">
+        <div class="layui-tab layui-tab-card site-demo-title" lay-filter="frame-tab" lay-allowclose="true">
+            <ul class="layui-tab-title">
+                <li class="layui-this">
+                    我的桌面
+                </li>
+            </ul>
+            <div class="layui-tab-content site-demo site-demo-body">
+                <div class="layui-tab-item layui-show">
+                    <iframe frameborder="0" src="{:url('welcome')}" class="x-iframe"></iframe>
+                </div>
             </div>
         </div>
     </div>
@@ -99,9 +112,24 @@ function change_app(app_id){
         }
     });
 }
-layui.use('form', function(){
-   
+layui.use(['form','element'], function(){
+    var element = layui.element();
+
+    //切换默认side    
+    init_side();
+    
+    //监听导航点击
+    element.on('nav(side)', function(elem){
+        //设置当前点击栏目
+        var item_id = this.getAttribute('item-id');
+        var child_id = this.getAttribute('child-id');
+        location.hash = '#'+item_id+'/'+child_id;
+
+        tabAdd(elem);
+    });
 });
+
+
 var _hmt = _hmt || [];
 (function() {
   var hm = document.createElement("script");

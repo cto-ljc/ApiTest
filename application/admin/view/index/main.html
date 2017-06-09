@@ -39,32 +39,30 @@
     <div class="layui-side layui-bg-black">
         <div class="layui-side-scroll">
             <ul class="layui-nav layui-nav-tree site-demo-nav" lay-filter="side">
-                <li class="layui-nav-item layui-nav-itemed">
+                <li class="layui-nav-item layui-nav-itemed" item-id="1">
                     <a class="javascript:;" href="javascript:;">
                         <!-- <i class="layui-icon" style="top: 3px;">&#xe631;</i> -->
                         <cite>项目管理</cite>
                     </a>         
                     <dl class="layui-nav-child"> 
-                        <dd  class="layui-this">
+                        <dd  class="layui-this" item-id="1" child-id="11">
                             <a href="javascript:;" _href="{:url('Api/apiManage')}">
                                 <cite>api管理</cite>
                             </a>
                         </dd>                                     
                     </dl>
                 </li>
-                <li class="layui-nav-item">
+                <li class="layui-nav-item" item-id="2">
                     <a class="javascript:;" href="javascript:;">
                         <!-- <i class="layui-icon" style="top: 3px;">&#xe613;</i> -->
                         <cite>用户管理</cite>
                     </a>
-                    <dl class="layui-nav-child">                    
-                        <dd class="">
-                            <dd class="">
-                                <a href="javascript:;" _href="{:url('User/userList')}">
-                                    <cite>用户列表</cite>
-                                </a>
-                            </dd>
-                        </dd>                   
+                    <dl class="layui-nav-child">   
+                        <dd class="" item-id="2" child-id="21">
+                            <a href="javascript:;" _href="{:url('User/userList')}">
+                                <cite>用户列表</cite>
+                            </a>
+                        </dd>  
                     </dl>     
                 </li>
                 <!-- <li class="layui-nav-item" style="height: 30px; text-align: center">
@@ -101,32 +99,15 @@
 layui.use(['form','element'], function(){
     var element = layui.element();
   
-    //…
+    init_side();
     //监听导航点击
     element.on('nav(side)', function(elem){
-        title = elem.find('cite').text();
-        url = elem.find('a').attr('_href');
-        id = elem.find('cite').text();
-        
-        //console.log($('.layui-tab-title li#'+id).length == 0);
+        //设置当前点击栏目
+        var item_id = this.getAttribute('item-id');
+        var child_id = this.getAttribute('child-id');
+        location.hash = '#'+item_id+'/'+child_id;
 
-        if($('.layui-tab-title li#'+id).length){    //如果不存在该选项卡 则创建 否则切换            
-            var index = $(".layui-tab-title li").index($('.layui-tab-title li#'+id));
-            element.tabDelete('frame-tab', id);  
-        }
-
-        res = element.tabAdd('frame-tab', {
-            title: title
-            ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
-            id:id
-        });
-
-        element.tabChange('frame-tab', $('.layui-tab-title li').length-1);
-
-        var length = $('.layui-tab-title li').length;
-        $('.layui-tab-title li').eq(length - 1).attr('id',id);  
-        
-        element.tabChange('frame-tab', id);     
+        tabAdd(elem);
     });
 
     element.on('nav(header-nav)', function(elem){
