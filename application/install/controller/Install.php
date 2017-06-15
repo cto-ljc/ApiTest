@@ -72,7 +72,7 @@ class Install extends \think\Controller{
                 unset($DB['database']);
                 $db  = \think\Db::connect($DB);//Db::getInstance($DB);
                 $sql = "CREATE DATABASE IF NOT EXISTS `{$dbname}` DEFAULT CHARACTER SET utf8";
-                $db->execute($sql) || $this->error($db->getError());
+                $db->execute($sql) !== false || $this->error($db->getError());
             }
 
             //跳转到数据库安装页面

@@ -13,6 +13,9 @@ define ( 'BIND_MODULE','install');
 define('APP_PATH', __DIR__ . '/application/');
 define('NOW_TIME',      $_SERVER['REQUEST_TIME']);
 
+// 定义配置文件目录和应用目录同级
+define('CONF_PATH', __DIR__.'/config/');
+
 // 加载框架引导文件
 require __DIR__ . '/thinkphp/start.php';
 
