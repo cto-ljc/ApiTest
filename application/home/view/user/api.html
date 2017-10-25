@@ -21,7 +21,7 @@
 					<div class="layui-input-block">
 						<input type="text" name="api_url" value="{$app_info.domain}{$api.url}" required placeholder="" autocomplete="off" class="layui-input">					
 						<div class="layui-inline" style=" line-height: 21px; padding: 0 0 0px 10px;">                        
-                            <input type="checkbox" name="localhost" lay-skin="switch" lay-filter="domain" title="开关">
+                            <input type="checkbox" name="api_domain_online" value='true' lay-skin="switch" lay-filter="domain" title="开关">
                         </div>          
                         <span class="remark">切换地址</span>         
 					</div>
@@ -185,15 +185,57 @@ layui.use('form', function(){
 	form.on('submit(*)', function(data){
 		var field = data.field;
 		var url = "{:url('apiPost')}";
+		var api_domain_online = field.api_domain_online;
 
 		save_api_param(field);  //对提交的参数进行本地存储
 		
-		field = field_encrypt(field);
-		console.log(field);
-		post(field,url,function(data){
+		if(api_domain_online){
+			field = field_encrypt(field);			
+			console.log(field);
+			post(field,url,function(data){
+				console.log(data);
+				api_callback(data);
+			});
+		}else{
+			var obj = data.elem;
 			
-			api_callback(data);
-		});
+			console.log('本地');
+			var url = field.api_url;
+
+			delete field.api_url;
+			delete field.api_domain_online;
+			
+			$.ajax({
+				type:"post",
+				url:url,
+				data:field,
+				dataType:'json',
+				success: function (data) {
+					console.log(data);
+		        },
+		       	error:function(ret){
+		            layer.alert('网络错误',{title:''});	            
+		        },
+		        beforeSend: function(xhr){               
+		            //var html = '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63d;</i>'+obj_html;
+		            //$(obj).html(html);
+		            load = layer.load();
+		            $(obj).attr('disabled','true');                     
+		        },
+		        complete: function(){  
+		            //$(obj).html(obj_html);
+		            layer.close(load);
+		            $(obj).removeAttr('disabled');                
+		        },
+		        
+			})
+
+			return false;
+		}
+
+		
+		
+		
 
 		return false;
 	});
