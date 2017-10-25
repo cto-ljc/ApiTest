@@ -14,14 +14,7 @@ return array(
     // +----------------------------------------------------------------------
     // | 模板替换
     // +----------------------------------------------------------------------
-    'view_replace_str'  =>  [
-    		'__PUBLIC__'=>__ROOT__.'/static',
-    		'__STATIC__' => __ROOT__.'/static',
-    		'__IMG__'    =>__ROOT__.'/static/install/images',
-    		'__CSS__'    => __ROOT__.'/static/install/css',
-    		'__JS__'     => __ROOT__.'/static/install/js',
-    ],
-    
+   
     // 默认控制器名
     'default_controller'     => 'install',
     // 默认操作名

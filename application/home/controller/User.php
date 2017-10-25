@@ -121,11 +121,14 @@ class User extends Common{
         $curlPost = substr($o,0,-1);
         $url = $param['api_url']; 
         $ch = curl_init();//初始化curl  
-        curl_setopt($ch,CURLOPT_URL, $url);//提交到指定网页  
-        curl_setopt($ch, CURLOPT_HEADER, 0);//设置header  
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);//要求结果为字符串且输出到屏幕上  
-        curl_setopt($ch, CURLOPT_POST, 1);//post提交方式  
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);  
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, []);
         $data = curl_exec($ch);//运行curl  
         curl_close($ch);  
         //echo($data);

@@ -3,6 +3,7 @@
 namespace app\install\controller;
 use think\Db;
 use com\Storage;
+use think\Route;
 
 class Install extends \think\Controller{
 
@@ -133,13 +134,18 @@ class Install extends \think\Controller{
             dump('baocu');
          	show_msg(session('error'));
         } else {     
-            $this->success('安装成功', 'complete');
+            Route::bind('');
+            $this->success('安装成功', 'install/install/complete');
         }
     }
 
     //安装完成
     public function complete(){
-
+        die;
+        if (!defined('__ROOT__')) {
+            $_root = rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/');
+            define('__ROOT__', (('/' == $_root || '\\' == $_root) ? '' : $_root));
+        }
         // 写入安装锁定文件 
         // file_put_contents('./static/data/install.lock', 'lock'); 
         // if(!session('update')){
