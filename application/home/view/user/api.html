@@ -50,7 +50,8 @@
 	<div class="layui-tab  layui-tab-card">
 		<ul class="layui-tab-title">
 			<li class="layui-this">json格式</li>
-			<li>源码</li>				
+			<li>源码</li>	
+			<li>html</li>				
 		</ul>
 		<div class="layui-tab-content">
 			<div class="layui-tab-item layui-show" id=''>
@@ -100,6 +101,9 @@
 			</div>
 			<div class="layui-tab-item Canvas">
 				<textarea id='RawJson' style="" readonly='true'></textarea>
+			</div>
+			<div class="layui-tab-item html">
+				
 			</div>
 		</div>
 	</div>
@@ -212,6 +216,7 @@ layui.use(['form','element'], function(){
 				data:field,
 				dataType:'json',
 				success: function (data) {
+					console.log(data);return;
 					var json_data = JSON.stringify(data);
 					$('#RawJson').val(json_data);	
 					//$id("RawJson").innerHTML = ret.data;
@@ -227,7 +232,15 @@ layui.use(['form','element'], function(){
 					}
 		        },
 		       	error:function(ret){
-		            layer.alert('网络错误',{title:''});	            
+		       		layer.open({
+					  	type: 1, 
+					  	title:'接口错误',
+					  	area:['800px','600px'],
+					  	content: ret.responseText//这里content是一个普通的String
+					});
+		       		// console.log(ret.responseText);
+		       		// $('.html').html(ret.responseText);	
+		         //    layer.alert('网络错误',{title:''});	            
 		        },
 		        beforeSend: function(xhr){               
 		            //var html = '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63d;</i>'+obj_html;
