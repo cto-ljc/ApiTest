@@ -31,7 +31,7 @@
 					<label class="layui-form-label">{$vo['name']}</label>
 					<div class="layui-input-block">
 						
-						<input type="text" value="{$vo['value']}" name="{$vo['name']}" required placeholder="" autocomplete="off" class="layui-input {$vo['class']}" encrypt="{$vo['encrypt']}">
+						<input type="text" value="{$vo['value']}" name="{$vo['name']}" placeholder="" autocomplete="off" class="layui-input {$vo['class']}" encrypt="{$vo['encrypt']}">
 												
 						<span class="remark">{$vo['remark']}</span>
 					</div>
@@ -46,7 +46,22 @@
 			</form>
 		</div>
 	</fieldset>
-	
+	<div class="layui-tab">
+  <ul class="layui-tab-title">
+    <li class="layui-this">网站设置</li>
+    <li>用户管理</li>
+    <li>权限分配</li>
+    <li>商品管理</li>
+    <li>订单管理</li>
+  </ul>
+  <div class="layui-tab-content">
+    <div class="layui-tab-item layui-show">内容1</div>
+    <div class="layui-tab-item">内容2</div>
+    <div class="layui-tab-item">内容3</div>
+    <div class="layui-tab-item">内容4</div>
+    <div class="layui-tab-item">内容5</div>
+  </div>
+</div>
 	<div class="layui-tab  layui-tab-card">
 		<ul class="layui-tab-title">
 			<li class="layui-this">json格式</li>
@@ -140,7 +155,7 @@ layui.use('form', function(){
 	localStorageCheck();
 	initialize();
 	
-	var form = layui.form();
+	var form = layui.form;
 
 	//自定义验证规则
 	form.verify({
@@ -196,9 +211,9 @@ layui.use('form', function(){
 				console.log(data);
 				api_callback(data);
 			});
-		}else{
+		}else{			
 			var obj = data.elem;
-			
+
 			console.log('本地');
 			var url = field.api_url;
 
@@ -211,7 +226,19 @@ layui.use('form', function(){
 				data:field,
 				dataType:'json',
 				success: function (data) {
-					console.log(data);
+					var json_data = JSON.stringify(data);
+					$('#RawJson').val(json_data);	
+					//$id("RawJson").innerHTML = ret.data;
+					
+					try{
+				    	var json = JSON.parse(json_data);
+				    	Process();	
+				    	layer.msg('请求成功');
+					}catch(e){
+						layer.msg('JSON数据格式不正确');
+						//alert("JSON数据格式不正确:\n"+e.message);
+						//$id("Canvas").innerHTML = "";
+					}
 		        },
 		       	error:function(ret){
 		            layer.alert('网络错误',{title:''});	            

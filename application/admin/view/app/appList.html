@@ -29,7 +29,7 @@
                 <td >{$vo.domain}</td>
                 <td>{$vo.test_domain}</td>
                 <td class="td-manage">                    
-                    <a title="编辑" href="javascript:;" onclick="banner_edit('编辑','{:url('editApp',array(\'app_id\' => $vo.id))}','4','','510')"
+                    <a title="编辑" href="javascript:;" onclick="$intop.open('{:url('editApp',array(\'app_id\' => $vo.id))}','编辑')"
                     class="ml-5" style="text-decoration:none">
                         <i class="layui-icon">&#xe642;</i>
                     </a>

@@ -84,7 +84,7 @@ class UserModel extends BaseUserModel{
         $salt = $this -> getSalt();
         $data["salt"] = $salt;
         $data["state"] = 0;
-        $data["add_time"] = time();
+        $data["reg_time"] = time();
         $data["del"] = 0;
         $reg = Db::name('user') -> insert($data);
         if ($reg) {
@@ -113,7 +113,7 @@ class UserModel extends BaseUserModel{
         $data["password"] = $this -> encodePWD($password,$salt);
         $data["salt"] = $salt;
         $data["state"] = 0;
-        $data["add_time"] = time();
+        $data["reg_time"] = time();
         $data["del"] = 0;
         $data['app_ids'] = $app_ids;
         $data['rid'] = 2;
