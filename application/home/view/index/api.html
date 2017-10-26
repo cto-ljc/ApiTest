@@ -275,7 +275,7 @@ function api_storage_key(param_name){
 	return api_id + '_' + param_name;
 }
 
-layui.use('form', function(){	
+layui.use(['form','element'], function(){	
 	localStorageCheck();
 	initialize();
 	
