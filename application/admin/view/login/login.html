@@ -57,19 +57,13 @@ background:rgba(0,0,0,0.1);
 width: 3px;
 background:rgba(0,0,0,0.3);
 }
-/*背景虚化*/
-.blur {    
-    -webkit-filter: blur(10px); /* Chrome, Opera */
-    -moz-filter: blur(10px);
-	-ms-filter: blur(10px);    
-	filter: blur(10px);    
-}
+
 	/*区域内虚化  值:像素*/
 		.blur {
-		    -webkit-filter: blur(2px); /* Chrome, Opera */
-		    -moz-filter: blur(2px);
-			-ms-filter: blur(2px);    
-			filter: blur(2px);    
+		    -webkit-filter: blur(1px); 
+		    -moz-filter: blur(1px);
+			-ms-filter: blur(1px);    
+			filter: blur(1px);    
 		}
 		.bg-canvas {
 			position: absolute;
@@ -90,6 +84,7 @@ background:rgba(0,0,0,0.3);
 			top: 0;
 			bottom: 0;
 			z-index: 1;
+			pointer-events: none;
 		}
 		.cont section {
 			width: 1200px;
@@ -122,6 +117,9 @@ background:rgba(0,0,0,0.3);
 			/*color: #fff;*/
 			border-radius: 10px;
 			padding:50px 15px;
+		}
+		.cont_right input,.cont_right button{
+			pointer-events: auto;
 		}
 		.cont_right h2 {
 			margin-bottom: 35px;
@@ -174,7 +172,7 @@ background:rgba(0,0,0,0.3);
 		}
 	</style>
 	<body id="body">
-		<nav class="bg-canvas blur"><iframe name="htm" src="http://www.jq22.com/js/a5.html"></iframe></nav>
+		<nav class="bg-canvas blur"><iframe name="htm" src="__STATIC__/h5/heidong.html"></iframe></nav>
 		<section class="cont">
 			<section>
 			<nav class="cont_left">
