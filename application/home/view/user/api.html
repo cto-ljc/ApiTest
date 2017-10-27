@@ -39,7 +39,7 @@
 				{/volist}				
 				<div class="layui-form-item">
 					<div class="layui-input-block">
-						<button class="layui-btn" lay-submit lay-filter="*">提交</button>
+						<button class="layui-btn" lay-submit lay-filter="api_submit">提交</button>
 						<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 					</div>
 				</div>
@@ -103,7 +103,7 @@
 				<textarea id='RawJson' style="" readonly='true'></textarea>
 			</div>
 			<div class="layui-tab-item html">
-				
+				<iframe frameborder="0" style="width:100%;height:100%;" id="html_iframe"></iframe>
 			</div>
 		</div>
 	</div>
@@ -187,7 +187,7 @@ layui.use(['form','element'], function(){
 	});
 
 	//监听提交
-	form.on('submit(*)', function(data){
+	form.on('submit(api_submit)', function(data){
 		var field = data.field;
 		var url = "{:url('apiPost')}";
 		var api_domain_online = field.api_domain_online;
@@ -204,19 +204,20 @@ layui.use(['form','element'], function(){
 		}else{			
 			var obj = data.elem;
 
-			console.log('本地');
 			var url = field.api_url;
 
 			delete field.api_url;
 			delete field.api_domain_online;
 			
+			var obj_html = $(obj).html();
+
 			$.ajax({
 				type:"post",
 				url:url,
 				data:field,
 				dataType:'json',
 				success: function (data) {
-					console.log(data);return;
+					console.log(data);
 					var json_data = JSON.stringify(data);
 					$('#RawJson').val(json_data);	
 					//$id("RawJson").innerHTML = ret.data;
@@ -231,26 +232,22 @@ layui.use(['form','element'], function(){
 						//$id("Canvas").innerHTML = "";
 					}
 		        },
-		       	error:function(ret){
-		       		layer.open({
-					  	type: 1, 
-					  	title:'接口错误',
-					  	area:['800px','600px'],
-					  	content: ret.responseText//这里content是一个普通的String
-					});
-		       		// console.log(ret.responseText);
-		       		// $('.html').html(ret.responseText);	
-		         //    layer.alert('网络错误',{title:''});	            
+		       	error:function(ret){		
+		       		layer.msg('JSON数据格式不正确');
+		       		//$("#html_iframe").contents().html('asdasd');
+		       		//$("#html_iframe").contents().find("body").html(ret.responseText)
+		       		//$("#html_iframe").contents().html(ret.responseText);
+		       		$(".layui-tab-item.html").html(ret.responseText);  
 		        },
 		        beforeSend: function(xhr){               
-		            //var html = '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63d;</i>'+obj_html;
-		            //$(obj).html(html);
-		            load = layer.load();
+		            var html = '<i class="layui-icon layui-anim layui-anim-rotate layui-anim-loop">&#xe63d;</i>'+obj_html;
+		            $(obj).html(html);
+		            //load = layer.load();
 		            $(obj).attr('disabled','true');                     
 		        },
 		        complete: function(){  
-		            //$(obj).html(obj_html);
-		            layer.close(load);
+		        	$(obj).html(obj_html);
+		            //layer.close(load);
 		            $(obj).removeAttr('disabled');                
 		        },
 		        
@@ -272,7 +269,7 @@ layui.use(['form','element'], function(){
 function api_callback(ret){
 	var code = ret.data;
 	$('#RawJson').val(ret.data);	
-	//$id("RawJson").innerHTML = ret.data;
+	$(".layui-tab-item.html").html(ret.data);
 	
 	try{
     	var json = JSON.parse(ret.data);

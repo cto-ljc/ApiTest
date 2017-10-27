@@ -7,6 +7,8 @@
 .api-nav{ background-color: #000; }
 .layui-table th.handle,.handle{width:100px; float:right; text-align: right;}
 .layui-tab-content .layui-tab-item .nav{    height: 30px;  line-height: 30px;  padding-right:5px;  }
+
+.nav_form_tab{  background-color: #c7c7c7; color: white; font-size: 25px !important; width: 20px !important; min-width: auto !important; }
 </style>
 
 <div class="layui-tab-content">
@@ -26,7 +28,7 @@
                 </select>
             </div>
             <div class="layui-inline">
-                <div class="layui-btn" onclick="navList('分类管理','{:url('App/appList',array('app_id' => $app_id))}','800','600')">项目管理</div>
+                <div class="layui-btn" id="app_manage_btn" onclick="app_manage(this)">项目管理</div>
             </div>
         </form>
         
@@ -40,18 +42,22 @@
                 {else /}
                     <li lay-id="{$vo.id}">{$vo.name}</li> 
                 {/if}                          
-            {/volist}     
-            
+            {/volist}   
+            {if condition="$app_id neq 0"}
+                <li class="nav_form_tab" lay-id="nav_form">+</li> 
+            {/if}  
         </ul>
-        {if condition="$app_id neq 0"}
-            <button class="layui-btn right nav_manage" onclick="navList('分类管理','{:url('ApiNav/navList',array('app_id' => $app_id))}','800','600')"><i class="layui-icon">&#xe608;</i> 分类管理</button>
-        {/if} 
+        
         <div class="layui-tab-content" style="padding: 10px;">
             {volist name="api_data" id="vo" key='key'}
                 <div class="layui-tab-item {if condition='$key eq 1'}layui-show{/if}">                    
                     <div class="nav">
-                        <button class="layui-btn layui-btn-mini" onclick="add_api('添加接口','{:url(\'addApi\',array(\'nav_id\' => $vo.id) )}','900','500')">添加接口</button>
-                        <span style='float:right;'>{$vo.name} 接口数量：<span class='right'>{$vo.api_count}</span></span>
+                        <div class="layui-btn-group">
+                            <button class="layui-btn layui-btn-mini" onclick="add_api('添加接口','{:url(\'addApi\',array(\'nav_id\' => $vo.id) )}','900','500')">添加接口</button>
+                            <button class="layui-btn layui-btn-mini layui-btn-warm" nav_id="{$vo.id}" onclick="edit_nav(this)">编辑栏目</button>
+                            <button class="layui-btn layui-btn-mini layui-btn-danger" nav_id="{$vo.id}" onclick="del_nav(this)">删除栏目</button>
+                        </div>
+                        <span style='float:right;'>{$vo.name} 接口数量：<span class='right api_count'>{$vo.api_count}</span></span>
                     </div>
                     <table class="layui-table" lay-even lay-skin="nob">
                         <thead>
@@ -81,16 +87,49 @@
                         </tbody>
                     </table>
                 </div>     
-            {/volist}              
+            {/volist}   
+            <div class="layui-tab-item">
+                <div class="layui-field-box">
+                    <form class="layui-form layui-form-pane1 nav_form" action="">
+                        <input type="hidden" name="nav_id" value="" placeholder="" autocomplete="off" class="layui-input">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">分类名称:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" lay-verify='required' value="<?php echo @$info['name'];?>" required placeholder="" autocomplete="off" class="layui-input">
+                                <span class="remark"></span>
+                            </div>
+                        </div>                        
+                       
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">排序:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="sort" value="<?php echo (@$info['sort'] ? @$info['sort'] : 100);?>" required placeholder="" autocomplete="off" class="layui-input">
+                                <span class="remark"></span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="nav_form">提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>           
         </div>
     </div>   
     
     <div id="page"></div>
 </div>
-
 <script>
 
-layui.use(['form','laydate','element','laypage','layer'], function(){
+function init_element(){
+    var element = layui.element;
+    var layid = location.hash.replace(/^#api_nav=/, '');
+    element.tabChange('api_nav', layid); //假设当前地址为：http://a.com#api_nav=222，那么选项卡会自动切换到“发送消息”这一项
+}
+
+layui.use(['form','element'], function(){
     // $ = layui.jquery;//jquery
     // laydate = layui.laydate;//日期插件
     // lement = layui.element();//面包导航
@@ -99,6 +138,8 @@ layui.use(['form','laydate','element','laypage','layer'], function(){
     var form = layui.form;
     var element = layui.element;
 
+    init_element();
+
     //以上模块根据需要引入
     form.on('select(app)', function(data){        
         var app_id = data.value;       
@@ -106,16 +147,104 @@ layui.use(['form','laydate','element','laypage','layer'], function(){
         window.location.href = url;
     });
 
-    var layid = location.hash.replace(/^#api_nav=/, '');
-    element.tabChange('api_nav', layid); //假设当前地址为：http://a.com#api_nav=222，那么选项卡会自动切换到“发送消息”这一项
+    
 
     element.on('tab(api_nav)', function(elem){
         var layid = this.getAttribute('lay-id');
 
         location.hash = 'api_nav='+ layid;
+
+        if(layid == 'nav_form'){
+            $('.layui-form.layui-form-pane1.nav_form input').val('');
+        }
+    });
+
+    //监听提交
+    form.on('submit(nav_form)', function(data){
+        var field = data.field;
+        if(field.nav_id){
+            var url = "{:url('api_nav/editNav',input('param.'))}";
+        }else{
+            var url = "{:url('api_nav/addNav',input('param.'))}";
+        }
+
+        //post(field,url);
+        $intop.post(data.elem,url,field,function(data){
+            if(data.success == true){
+                var nav_id = data.data.nav_id;
+                location.hash = 'api_nav='+ nav_id;              
+                layer.msg(data.msg,{time:1000},function(){
+                    location.reload();
+                });                          
+            }else{
+                layer.alert(data.msg);
+            }           
+        });
+        return false;
     });
 });
 
+/*刷新页面*/
+function reload(){
+    location.reload(),
+    console.log('reload');
+}
+
+/*编辑栏目*/
+function edit_nav(obj){
+    var nav_json = '{:json_encode($api_data)}';
+    var nav_list = JSON.parse(nav_json);
+    var nav_id = $(obj).attr('nav_id');
+
+    var nav = {};
+    for(var i in nav_list){
+        if(nav_id == nav_list[i]['id']){            
+            nav = nav_list[i];
+        }
+    }
+
+    $('.layui-form.layui-form-pane1.nav_form input[name="nav_id"]').val(nav['id']);
+    $('.layui-form.layui-form-pane1.nav_form input[name="name"]').val(nav['name']);
+    $('.layui-form.layui-form-pane1.nav_form input[name="sort"]').val(nav['sort']);
+
+    var element = layui.element;
+    var layid = 'nav_form';
+    element.tabChange('api_nav', layid);
+}
+
+/*删除栏目*/
+function del_nav(obj){
+    var nav_id = $(obj).attr('nav_id');
+
+    layer.confirm('确认要删除吗？',function(index){
+        var url = "{:url('api_nav/delNav')}";
+        var data = {};
+        data['app_id'] = nav_id;
+        post(data,url,function(ret){    //发异步删除数据
+            var msg = ret.msg;
+            if(ret.success == true){
+                layer.msg(msg,{icon:1,time:1000},function(){
+                    location.href = document.referrer;          
+                });                      
+            }else{
+                layer.alert(data.msg);
+            }                
+            
+        });
+        
+    });
+}
+    
+/*项目管理*/
+function app_manage(obj){
+    // var id = parent.getActiveTabId();
+    // console.log(id);
+    //$intop.open('{:url('App/appList',array('app_id' => $app_id))}','项目管理');
+
+    parent.addTab('app_manage','{:url('App/appList',array('app_id' => $app_id))}','项目管理');
+}
+
+var reload_status = false; 
 /*添加*/
 function navList(title,url,w,h){
     layer.open({
@@ -128,7 +257,10 @@ function navList(title,url,w,h){
         title: title,
         content: url,
         end: function(){
-            location.reload();
+            if(reload_status){
+                reload_status = false;
+                location.reload();
+            }
         }
     });        
 }
@@ -176,6 +308,11 @@ function del_api(obj,api_id){
         var msg = ret.msg;
         if(ret.success == true){
             var tr = $(obj).parents('tr');
+
+            var api_count = $('.layui-tab-item.layui-show .api_count').html();
+            api_count = api_count * 1 - 1 ;
+            $('.layui-tab-item.layui-show .api_count').html(api_count);
+            
             $(tr).remove();
         }
         layer.msg(msg);

@@ -113,7 +113,11 @@ layui.use('form', function(){
 		console.log(url);
 		console.log(field);	
 		
-		post(field,url);
+		//post(field,url);
+		$intop.post(data.elem,url,field,function(){
+			parent.parent.reload_status = true;
+			parent.location.href = document.referrer;			  
+		});
 		return false;
 	});
   

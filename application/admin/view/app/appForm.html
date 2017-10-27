@@ -97,7 +97,12 @@ layui.use('form', function(){
 		console.log(url);
 		console.log(field);	
 		
-		post(field,url);
+		//post(field,url);
+		var obj = data.elem;
+		$intop.post(obj,url,field,function(){
+			parent.parent.update_api_manage(false);
+			parent.location.href = document.referrer;			  
+		});
 
 		return false;
 	});

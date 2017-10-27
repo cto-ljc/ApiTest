@@ -120,6 +120,8 @@ function del(obj,id){
                 var total = $('#nav_total').html();               
                 total = total - 1;
                 $('#nav_total').html(total);
+
+                parent.reload_status = true;
             }                
             layer.msg(msg,{icon:1,time:1000});
         });

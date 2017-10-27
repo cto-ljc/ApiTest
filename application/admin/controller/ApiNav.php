@@ -27,9 +27,10 @@ class ApiNav extends Common{
 			$data['name'] = input('post.name');
 			$data['icon'] = input('post.icon');
 			$data['sort'] = input('post.sort');
+			$data['sort'] = $data['sort'] ? $data['sort'] : 100;
 
 			if($NavModel -> editNav($nav_id,$data) !== false){
-				json_success('修改成功',array('callback_type' => 2));
+				json_success('修改成功',array('nav_id' => $nav_id));
 			}else{
 				json_error($NavModel -> getError());
 			}
@@ -54,9 +55,11 @@ class ApiNav extends Common{
 			$data['name'] = input('post.name');
 			$data['icon'] = input('post.icon');
 			$data['sort'] = input('post.sort');
+			$data['sort'] = $data['sort'] ? $data['sort'] : 100;
+			$nav_id = $NavModel -> addNav($data);
 
-			if($NavModel -> addNav($data) !== false){
-				json_success('添加成功',array('callback_type' => 2));
+			if( $nav_id !== false){
+				json_success('添加成功',array('nav_id' => $nav_id));
 			}else{
 				json_error($NavModel -> getError());
 			}

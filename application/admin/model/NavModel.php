@@ -45,7 +45,7 @@ class NavModel extends BaseModel{
 			$this -> error = '此分类已存在';
 			return false;
 		}
-		return db('nav_item') -> insert($data);
+		return db('nav_item') -> insertGetId($data);
 	}
 
 	/*

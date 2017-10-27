@@ -49,13 +49,19 @@
 layui.use(['laydate','element','laypage','layer'], function(){
     $ = layui.jquery;//jquery
     laydate = layui.laydate;//日期插件
-    lement = layui.element();//面包导航
+    lement = layui.element;//面包导航
     laypage = layui.laypage;//分页
     layer = layui.layer;//弹出层
 
     //以上模块根据需要引入
   
 });
+
+//更新api_manage数据
+// function update_api_manage(){
+//     parent.update_api_manage();     //更新api_manage页面
+//     parent.closeTab('app_manage');  //关闭app_manage tab
+// }
 
 //批量删除提交
  function delAll () {
@@ -113,6 +119,7 @@ function banner_del(obj,id){
             var msg = ret.msg;
             if(ret.success == true){
                 $(obj).parents("tr").remove();
+                parent.update_api_manage(false);     //更新api_manage页面
             }                
             layer.msg(msg,{icon:1,time:1000});
         });

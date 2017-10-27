@@ -46,7 +46,7 @@
                     </a>         
                     <dl class="layui-nav-child"> 
                         <dd  class="layui-this" item-id="1" child-id="11">
-                            <a href="javascript:;" _href="{:url('Api/apiManage')}">
+                            <a href="#1/11" _href="{:url('Api/apiManage')}">
                                 <cite>api管理</cite>
                             </a>
                         </dd>                                     
@@ -59,7 +59,7 @@
                     </a>
                     <dl class="layui-nav-child">   
                         <dd class="" item-id="2" child-id="21">
-                            <a href="javascript:;" _href="{:url('User/userList')}">
+                            <a href="#2/21" _href="{:url('User/userList')}">
                                 <cite>用户列表</cite>
                             </a>
                         </dd>  
@@ -73,7 +73,7 @@
     <div class="layui-body site-demo">
         <div class="layui-tab layui-tab-card site-demo-title" lay-filter="frame-tab" lay-allowclose="true">
             <ul class="layui-tab-title">
-                <li class="layui-this" lay-id="api管理" id="api管理">
+                <li class="layui-this" lay-id="111" id="111">
                     api管理
                 </li>
             </ul>
@@ -134,7 +134,7 @@ function addTab(id,url,title){
 
     res = element.tabAdd('frame-tab', {
         title: title
-        ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
+        ,content: '<iframe frameborder="0" name="f'+id+'" src="'+url+'" class="x-iframe"></iframe>',
         id:id
     });
 
@@ -144,6 +144,13 @@ function addTab(id,url,title){
     $('.layui-tab-title li').eq(length - 1).attr('id',id);  
     
     element.tabChange('frame-tab', id);   
+}
+
+/*关闭tab层*/
+function closeTab(layid){
+    var element = layui.element;    
+    element.tabDelete('frame-tab', layid);
+    console.log(layid);
 }
 
 //初始化侧边栏
@@ -168,7 +175,11 @@ function init_side(){
     show_iframe(elem);
 }
 
-
+/*获取当前活动tabid*/
+function getActiveTabId(){
+    var id = $('.layui-tab.layui-tab-card.site-demo-title .layui-tab-title li.layui-this').attr('id');
+    return id;    
+}
 
  /*添加*/
 function help(){
@@ -183,5 +194,25 @@ function help(){
         content: "{:url('help')}",
         end: null
     });    
+}
+</script>
+
+<script type="text/javascript">
+function update_api_manage(show = true){
+    var element = layui.element;
+    console.log('update_api_manage');
+    if(show){
+        $('#111').click();
+    }
+    
+    if(window.f111){
+        window.f111.reload(); 
+    }
+    
+    // console.log(window.f111);
+    // console.log($(".layui-tab-content .layui-tab-item.layui-show iframe"));
+    //$(".layui-tab-content .layui-tab-item.layui-show iframe").window.test();
+    //$(".layui-tab-content .layui-tab-item.layui-show iframe").contents().find("#app_manage_btn").html('asdasd');
+    //console.log(eq);
 }
 </script>
