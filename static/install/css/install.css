@@ -11,7 +11,7 @@
 -------------------------------------------------- */
 
 body {
-    position: relative;
+    position: inherit;
     padding-top: 40px;
 	font: 14px/1.5 "microsoft yahei", Helvetica, Tahoma, Arial, sans-serif;
 }
@@ -89,7 +89,10 @@ hr.soften {
 /* Base class
 ------------------------- */
 .jumbotron {
-    position: relative;
+    position: absolute;
+    width: 100%;
+    top: 51px;
+    bottom: 68px;
     padding: 40px 0;
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,.4), 0 0 30px rgba(0,0,0,.075);
@@ -103,6 +106,8 @@ hr.soften {
     -webkit-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
     -moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
     box-shadow: inset 0 3px 7px rgba(0,0,0,.2), inset 0 -3px 7px rgba(0,0,0,.2);
+    overflow: auto;
+
 }
 .jumbotron h1 {
     font-size: 80px;

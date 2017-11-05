@@ -1,21 +1,28 @@
 <?php
 
 namespace app\install\controller;
+
 use think\Db;
 use com\Storage;
 use think\Route;
 
 class Install extends \think\Controller{
+    public $reset_auto = '';
 
     protected function _initialize(){
-        // if(is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
-        //     $url = 'http://'. $_SERVER['SERVER_NAME'] . rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/');
-        //     $this->error('已经成功安装了api_test，请不要重复安装!',$url);
-        // }
+
+        if(is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
+            $reset_auto = session('reset_auto');
+            if(!$reset_auto && request() -> action() != 'index'){
+                $this->redirect('Install/Install/index');
+            }
+            //echo '重新安装将会清空所有项目数据';
+        }   
     }
 
     //安装首页
-    public function index(){        
+    public function index(){     
+        
         return $this->fetch();
     }
 
