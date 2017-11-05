@@ -12,7 +12,7 @@ class App extends Common{
         $total = $app_list_data['total'];
         $this -> assign('app_list',$app_list);
         $this -> assign('total',$total);
-		return view();
+		return view('appList');
 	}
 
 	public function addApp(){
