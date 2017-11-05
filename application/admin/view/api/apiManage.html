@@ -163,10 +163,13 @@ layui.use(['form','element'], function(){
     form.on('submit(nav_form)', function(data){
         var field = data.field;
         if(field.nav_id){
-            var url = "{:url('api_nav/editNav',input('param.'))}";
+            var url = "{:url('api_nav/editNav')}";
         }else{
-            var url = "{:url('api_nav/addNav',input('param.'))}";
+            var url = "{:url('api_nav/addNav')}";
+            field['app_id'] = "{$app_id}";
         }
+
+        
 
         //post(field,url);
         $intop.post(data.elem,url,field,function(data){

@@ -28,6 +28,7 @@ class Api extends Common{
 		$ApiModel = Loader::model('ApiModel');                      //实例化模型
 		$api_data = $ApiModel -> apiData($app_id);
 		$this -> assign('api_data',$api_data);
+		$this -> assign('app_id',$app_id);
 		
 		return view('apiManage');
 	}
