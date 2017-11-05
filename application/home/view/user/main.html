@@ -98,6 +98,7 @@ function change_app(app_id){
     post(data,url,function(ret){
         if(ret.success == true){
             location.reload();
+            //location.href = document.referrer;   
         }
     });
 }

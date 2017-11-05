@@ -210,7 +210,8 @@ layui.use(['form','element'], function(){
 			delete field.api_domain_online;
 			
 			var obj_html = $(obj).html();
-
+			field = field_encrypt(field);		
+			
 			$.ajax({
 				type:"post",
 				url:url,
