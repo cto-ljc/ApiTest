@@ -6,9 +6,8 @@ use think\Request;
 use think\Loader;
 
 class Index extends \think\Controller{
-    public function index()
-    {
-        $this->redirect('api');
+    public function index()   {
+        
     }
 
     //api测试页

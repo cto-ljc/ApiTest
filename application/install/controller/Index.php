@@ -10,4 +10,8 @@ class Index extends \think\Controller{
     public function index(){        
         echo config('default_controller');
     }
+
+    public function test(){
+    	echo 'install test';
+    }
 }

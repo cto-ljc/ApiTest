@@ -134,17 +134,18 @@ function write_config($config, $auth)
 {
     if (is_array($config)) {
         //读取配置内容
-        $config_tpl = file_get_contents(MODULE_PATH . 'data/config.tpl');
-        $tags_tpl = file_get_contents(MODULE_PATH . 'data/tags.tpl');
+        //$config_tpl = file_get_contents(MODULE_PATH . 'data/config.tpl');
+        //$tags_tpl = file_get_contents(MODULE_PATH . 'data/tags.tpl');
         $database = file_get_contents(MODULE_PATH . 'data/database.tpl');
+        $route = file_get_contents(MODULE_PATH . 'data/route.tpl');
         //替换配置项
         foreach ($config as $name => $value) {
-            $config_tpl = str_replace("[{$name}]", $value, $config_tpl);
-            $tags_tpl = str_replace("[{$name}]", $value, $tags_tpl);
+            //$config_tpl = str_replace("[{$name}]", $value, $config_tpl);
+            //$tags_tpl = str_replace("[{$name}]", $value, $tags_tpl);
             $database = str_replace("[{$name}]", $value, $database);
         } 
         
-        $config_tpl = str_replace('[AUTH_KEY]', $auth, $config_tpl);
+        //$config_tpl = str_replace('[AUTH_KEY]', $auth, $config_tpl);
 
         //写入应用配置文件
         if (!IS_WRITE) {            
@@ -158,6 +159,14 @@ function write_config($config, $auth)
                 show_msg('配置文件写入失败！', 'error');
                 session('error', true);
             }
+
+            if ( file_put_contents(ROOT_PATH . 'config/route.php', $route)) {
+                show_msg('路由文件写入成功！');
+            } else {
+                show_msg('路由文件写入失败！', 'error');
+                session('error', true);
+            }
+
             return true;
         }
     }

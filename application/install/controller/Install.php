@@ -8,10 +8,10 @@ use think\Route;
 class Install extends \think\Controller{
 
     protected function _initialize(){
-        if(is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
-            $url = 'http://'. $_SERVER['SERVER_NAME'] . rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/');
-            $this->error('已经成功安装了api_test，请不要重复安装!',$url);
-        }
+        // if(is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
+        //     $url = 'http://'. $_SERVER['SERVER_NAME'] . rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/');
+        //     $this->error('已经成功安装了api_test，请不要重复安装!',$url);
+        // }
     }
 
     //安装首页
@@ -105,8 +105,9 @@ class Install extends \think\Controller{
         }
 
         echo $this->fetch();
-
+       
         if(session('update')){
+            
             $db = \think\Db::connect();
             //更新数据表
             update_tables($db, config('database.prefix'));
@@ -127,21 +128,22 @@ class Install extends \think\Controller{
             
             //创建配置文件
             $conf   =   write_config($dbconfig, $auth);
-            session('config_file',$conf);           
+
+            session('config_file',$conf);      
+
         }
 
         if(session('error')){
             dump('baocu');
          	show_msg(session('error'));
-        } else {     
-            Route::bind('');
-            $this->success('安装成功', 'install/install/complete');
+        } else {  
+            $this->success('安装成功', 'install/install/complete',0);
         }
     }
 
     //安装完成
     public function complete(){
-        die;
+        
         if (!defined('__ROOT__')) {
             $_root = rtrim(dirname(rtrim($_SERVER['SCRIPT_NAME'], '/')), '/');
             define('__ROOT__', (('/' == $_root || '\\' == $_root) ? '' : $_root));
