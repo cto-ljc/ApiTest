@@ -18,7 +18,7 @@ class User extends Common{
 
         $this -> assign('list',$user_list);
         $this -> assign('total',$total);
-    	return view();
+    	return view('userList');
     }
 
     //添加用户 ,刘海诚 2017年2月7日17:02:28
@@ -39,7 +39,7 @@ class User extends Common{
         }else{
             $app_list = db('app') -> select();
             $this -> assign('app_list',$app_list);
-            return view();
+            return view('adminAdd');
         }
     }
 
@@ -79,7 +79,7 @@ class User extends Common{
                 json_error('修改失败');
             }            
         }else{
-            return view();
+            return view('updatePassword');
         }        
     }
 
