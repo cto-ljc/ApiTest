@@ -14,8 +14,6 @@ return [
         'name' => '\w+',
     ],
 
-    '/' => 'install/install/index',
-
     '[hello]'     => [
         ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
         ':name' => ['index/hello', ['method' => 'post']],

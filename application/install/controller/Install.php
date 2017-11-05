@@ -13,11 +13,15 @@ class Install extends \think\Controller{
 
         if(is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
             $reset_auto = session('reset_auto');
-            if(!$reset_auto && request() -> action() != 'index'){
-                $this->redirect('Install/Install/index');
-            }
-            //echo '重新安装将会清空所有项目数据';
+            if(!$reset_auto && request() -> action() != 'reset'){
+                $this->redirect('Install/Install/reset');
+            }            
         }   
+    }
+
+    //重装
+    public function reset(){
+        return view();
     }
 
     //安装首页
