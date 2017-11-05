@@ -9,6 +9,13 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+use think\Route;
+
+if(!is_file(ROOT_PATH . 'config/database.php') && request() -> action() != 'complete'){
+    Route::rule('/','install/install/index');        
+}   
+
+
 return [
     '__pattern__' => [
         'name' => '\w+',
