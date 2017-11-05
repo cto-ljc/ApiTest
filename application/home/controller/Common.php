@@ -7,7 +7,7 @@ class Common extends \think\Controller{
 	protected $app_id;
 	protected $uid;
 	//魔术方法 
-    function __construct() {die;
+    function __construct() {
         parent::__construct();	
 
         $this -> app_id = Session::get('app_id');
