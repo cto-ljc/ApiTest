@@ -112,7 +112,7 @@ class UserModel extends BaseUserModel{
         $salt = $this -> getSalt();
         $data["password"] = $this -> encodePWD($password,$salt);
         $data["salt"] = $salt;
-        $data["state"] = 0;
+        $data["state"] = 1;
         $data["reg_time"] = time();
         $data["del"] = 0;
         $data['app_ids'] = $app_ids;
