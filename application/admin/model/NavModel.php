@@ -41,6 +41,7 @@ class NavModel extends BaseModel{
 	 */
 	public function addNav($data){
 		$map['name'] = $data['name'];
+		$map['app_id'] = $data['app_id'];
 		if(db('nav_item') -> where($map) -> count()){
 			$this -> error = '此分类已存在';
 			return false;
