@@ -2,8 +2,8 @@
 <div class="layui-tab-content">
     <xblock>
         <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
-        <button class="layui-btn" onclick="banner_add('添加项目','{:url('addApp')}','600','500')"><i class="layui-icon">&#xe608;</i>添加</button>
-        <span class="x-right" style="line-height:40px">共有数据：{$total} 条</span>
+        <button class="layui-btn" onclick="banner_add('添加项目','{:url('addApp')}','800','600')">添加</button>
+        <span class="x-right" style="line-height:40px">共有项目：{$list_data -> total()} </span>
     </xblock>
     <table class="layui-table">
         <thead>
@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            {volist name="app_list" id="vo"}
+            {volist name="list_data" id="vo"}
             <tr>
                 <td><input type="checkbox" value="1" name=""></td>
                 <td>{$vo['id']}</td>
@@ -42,7 +42,7 @@
             {/volist}
         </tbody>
     </table>
-
+    {$list_data -> render()}
     <div id="page"></div>
 </div>
 <script>

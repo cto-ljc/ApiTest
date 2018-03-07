@@ -11,7 +11,7 @@ class User extends Common{
         $size = input('param.size',10);
         $state = input('param.state',false);
 
-        $UserModel = Loader::model('UserModel');                      //实例化模型
+        $UserModel = new \app\admin\model\User();                      //实例化模型
         $user_list_data = $UserModel -> userList($page,$size,$state);
         $user_list  = $user_list_data['list'];
         $total = $user_list_data['total'];
@@ -28,7 +28,7 @@ class User extends Common{
             $password = input("post.password");
             $app_ids = input("post.app_ids");
 
-            $UserModel = Loader::model('UserModel');
+            $UserModel = new \app\admin\model\User();
             $admina_Add = $UserModel -> admina_Add($account,$password,$app_ids);
 
             if ($admina_Add) {
@@ -49,7 +49,7 @@ class User extends Common{
         if ($uid == request() -> session("admin_uid")) {
            json_error("你不能删除自己哦");
         }
-        $UserModel = Loader::model('UserModel');
+        $UserModel = new \app\admin\model\User();   
         $del_user = $UserModel -> del_user($uid);
         if ($del_user) {
             json_success('删除成功');
@@ -72,7 +72,7 @@ class User extends Common{
                 json_error('参数错误',array($uid,$password));
             }
 
-            $UserModel = Loader::model('UserModel');                      //实例化模型
+            $UserModel = new \app\admin\model\User();                        //实例化模型
             if($UserModel -> updatePassword($uid,$password)){
                 json_success('修改成功');
             }else{

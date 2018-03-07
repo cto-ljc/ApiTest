@@ -15,7 +15,7 @@ class User extends Common{
      */
     public function main(){    
         $NavModel = Loader::model('NavModel');              //实例化模型
-        $AppModel = Loader::model('AppModel');              //实例化模型
+        $AppModel = new \app\admin\model\App();              //实例化模型
        
 
         $app_list = $AppModel -> getAppList($this -> uid);  //app项目列表
@@ -45,7 +45,7 @@ class User extends Common{
         $app_info = $AppModel -> appInfo($this -> app_id);  //app项目详情
         $this -> assign('app_info',$app_info);              //视图参数
 
-        $UserModel = Loader::model('UserModel'); 
+        $UserModel = new \app\admin\model\User();   
         $user_info = $UserModel -> userInfo($this -> uid);
 
         $this -> assign('user_info',$user_info);
@@ -73,7 +73,7 @@ class User extends Common{
 
     //api测试页
     public function api($api_id = 0){
-        $AppModel = Loader::model('AppModel');                      //实例化模型
+        $AppModel = new \app\admin\model\App();                      //实例化模型
         $app_info = $AppModel -> appInfo($this -> app_id);          //app项目详情
         $domain_type = Session::get('domain_type');
         if($domain_type == 2){

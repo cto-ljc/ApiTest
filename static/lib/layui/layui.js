@@ -19,13 +19,23 @@
   }
 
   ,Layui = function(){
-    this.v = '2.1.5'; //版本号
+    this.v = '2.2.5'; //版本号
   }
 
   //获取layui所在目录
   ,getPath = function(){
-    var js = doc.scripts
-    ,jsPath = js[js.length - 1].src;
+    var jsPath = doc.currentScript ? doc.currentScript.src : function(){
+      var js = doc.scripts
+      ,last = js.length - 1
+      ,src;
+      for(var i = last; i > 0; i--){
+        if(js[i].readyState === 'interactive'){
+          src = js[i].src;
+          break;
+        }
+      }
+      return src || js[last].src;
+    }();
     return jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
   }()
 
@@ -63,27 +73,33 @@
   Layui.prototype.cache = config;
 
   //定义模块
-  Layui.prototype.define = function(deps, callback){
+  Layui.prototype.define = function(deps, factory){
     var that = this
     ,type = typeof deps === 'function'
-    ,mods = function(){
-      typeof callback === 'function' && callback(function(app, exports){
+    ,callback = function(){
+      var setApp = function(app, exports){
         layui[app] = exports;
         config.status[app] = true;
+      };
+      typeof factory === 'function' && factory(function(app, exports){
+        setApp(app, exports);
+        config.callback[app] = function(){
+          factory(setApp);
+        }
       });
       return this;
     };
     
     type && (
-      callback = deps,
+      factory = deps,
       deps = []
     );
     
     if(layui['layui.all'] || (!layui['layui.all'] && layui['layui.mobile'])){
-      return mods.call(that);
+      return callback.call(that);
     }
-    
-    that.use(deps, mods);
+
+    that.use(deps, callback);
     return that;
   };
 
@@ -146,9 +162,16 @@
     //首次加载模块
     if(!config.modules[item]){
       var node = doc.createElement('script')
-      ,url =  (
-        modules[item] ? (dir + 'lay/') : (config.base || '')
+      
+      //如果是内置模块，则按照 dir 参数拼接模块路径
+      //如果是扩展模块，则判断模块路径值是否为 {/} 开头，
+      //如果路径值是 {/} 开头，则模块路径即为后面紧跟的字符。
+      //否则，则按照 base 参数拼接模块路径
+      ,url = ( modules[item] ? (dir + 'lay/') 
+        : (/^\{\/\}/.test(that.modules[item]) ? '' : (config.base || ''))
       ) + (that.modules[item] || item) + '.js';
+      
+      url = url.replace(/^\{\/\}/, '');
       
       node.async = true;
       node.charset = 'utf-8';
@@ -226,6 +249,18 @@
     
     return that;
   };
+  
+  //存储模块的回调
+  config.callback = {};
+  
+  //重新执行模块的工厂函数
+  Layui.prototype.factory = function(modName){
+    if(layui[modName]){
+      return typeof config.callback[modName] === 'function' 
+        ? config.callback[modName]
+      : null;
+    }
+  };
 
   //css内部加载器
   Layui.prototype.addcss = function(firename, fn, cssname){
@@ -280,7 +315,7 @@
         that.modules[o] = options[o];
       }
     }
-    
+
     return that;
   };
 
@@ -295,7 +330,8 @@
     };
     
     if(!/^#\//.test(hash)) return data; //禁止非路由规范
-    hash = hash.replace(/^#\//, '').replace(/([^#])(#.*$)/, '$1').split('/') || [];
+    data.href = hash = hash.replace(/^#\//, '');
+    hash = hash.replace(/([^#])(#.*$)/, '$1').split('/') || [];
     
     //提取Hash结构
     that.each(hash, function(index, item){
@@ -304,19 +340,20 @@
         data.search[item[0]] = item[1];
       }() : data.path.push(item);
     });
-
+    
     return data;
   };
 
-  //本地存储
-  Layui.prototype.data = function(table, settings){
+  //本地持久性存储
+  Layui.prototype.data = function(table, settings, storage){
     table = table || 'layui';
+    storage = storage || localStorage;
     
     if(!win.JSON || !win.JSON.parse) return;
     
     //如果settings为null，则删除表
     if(settings === null){
-      return delete localStorage[table];
+      return delete storage[table];
     }
     
     settings = typeof settings === 'object' 
@@ -324,17 +361,22 @@
     : {key: settings};
     
     try{
-      var data = JSON.parse(localStorage[table]);
+      var data = JSON.parse(storage[table]);
     } catch(e){
       var data = {};
     }
     
-    if(settings.value) data[settings.key] = settings.value;
+    if('value' in settings) data[settings.key] = settings.value;
     if(settings.remove) delete data[settings.key];
-    localStorage[table] = JSON.stringify(data);
+    storage[table] = JSON.stringify(data);
     
     return settings.key ? data[settings.key] : data;
   };
+  
+  //本地会话性存储
+  Layui.prototype.sessionData = function(table, settings){
+    return this.data(table, settings, sessionStorage);
+  }
 
   //设备信息
   Layui.prototype.device = function(key){
@@ -408,7 +450,7 @@
   //将数组中的对象按其某个成员排序
   Layui.prototype.sort = function(obj, key, desc){
     var clone = JSON.parse(
-      JSON.stringify(obj)
+      JSON.stringify(obj || [])
     );
     
     if(!key) return clone;
@@ -442,45 +484,60 @@
   };
 
   //阻止事件冒泡
-  Layui.prototype.stope = function(e){
-    e = e || win.event;
-    e.stopPropagation 
-      ? e.stopPropagation() 
-    : e.cancelBubble = true;
+  Layui.prototype.stope = function(thisEvent){
+    thisEvent = thisEvent || win.event;
+    try { thisEvent.stopPropagation() } catch(e){
+      thisEvent.cancelBubble = true;
+    }
   };
 
   //自定义模块事件
   Layui.prototype.onevent = function(modName, events, callback){
     if(typeof modName !== 'string' 
     || typeof callback !== 'function') return this;
-    config.event[modName + '.' + events] = [callback];
-    
-    //不再对多次事件监听做支持
-    /*
-    config.event[modName + '.' + events] 
-      ? config.event[modName + '.' + events].push(callback) 
-    : config.event[modName + '.' + events] = [callback];
-    */
-    
-    return this;
+
+    return Layui.event(modName, events, null, callback);
   };
 
   //执行自定义模块事件
-  Layui.prototype.event = function(modName, events, params){
+  Layui.prototype.event = Layui.event = function(modName, events, params, fn){
     var that = this
     ,result = null
-    ,filter = events.match(/\(.*\)$/)||[] //提取事件过滤器
-    ,set = (events = modName + '.'+ events).replace(filter, '') //获取事件本体名
+    ,filter = events.match(/\((.*)\)$/)||[] //提取事件过滤器字符结构，如：select(xxx)
+    ,eventName = (modName + '.'+ events).replace(filter[0], '') //获取事件名称，如：form.select
+    ,filterName = filter[1] || '' //获取过滤器名称,，如：xxx
     ,callback = function(_, item){
       var res = item && item.call(that, params);
       res === false && result === null && (result = false);
     };
-    layui.each(config.event[set], callback);
-    filter[0] && layui.each(config.event[events], callback); //执行过滤器中的事件
+    
+    //添加事件
+    if(fn){
+      config.event[eventName] = config.event[eventName] || {};
+
+      //这里不再对多次事件监听做支持，避免更多麻烦
+      //config.event[eventName][filterName] ? config.event[eventName][filterName].push(fn) : 
+      config.event[eventName][filterName] = [fn];
+      return this;
+    }
+    
+    //执行事件回调
+    layui.each(config.event[eventName], function(key, item){
+      //执行当前模块的全部事件
+      if(filterName === '{*}'){
+        layui.each(item, callback);
+        return;
+      }
+      
+      //执行指定事件
+      key === '' && layui.each(item, callback);
+      key === filterName && layui.each(item, callback);
+    });
+    
     return result;
   };
 
   win.layui = new Layui();
-
+  
 }(window);
 

@@ -4,21 +4,14 @@ namespace app\admin\model;
 use think\Model;
 use think\Db;
 
-class AppModel extends Model{
-	// 设置当前模型对应的完整数据表名称
-    protected $table = 'api_app';
-
+class App extends Model{	
 	/*
 	 * 获取app项目列表
 	 * return $list
 	 */
-	public function getAppList(){
-		$map = array();
-		$app_list = Db::name('app') -> where($map) -> order(array('sort' => 'asc')) -> select();
-		$total = Db::name('app') -> where($map) -> count();
-		$data['list'] = $app_list;
-		$data['total'] = $total;
-		return $data;
+	public function getAppList($page_size = 15,$map=[]){
+		$list = $this -> where($map) -> order(['sort' => 'asc']) -> paginate($page_size,'',['query'=>input('get.')]);
+		return $list;
 	}
 
 	/*

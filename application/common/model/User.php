@@ -4,7 +4,7 @@ namespace app\common\model;
 use think\Model;
 use think\Db;
 
-class BaseUserModel extends BaseModel{
+class User extends BaseModel{
 	private $sugar = ''; 
 
 	//得到盐

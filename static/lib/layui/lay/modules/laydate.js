@@ -1,6 +1,6 @@
 /**
  
- @Name : layDate 5.0.7 日期时间控件
+ @Name : layDate 5.0.9 日期时间控件
  @Author: 贤心
  @Site：http://www.layui.com/laydate/
  @License：MIT
@@ -12,8 +12,18 @@
 
   var isLayui = window.layui && layui.define, ready = {
     getPath: function(){
-      var js = document.scripts, script = js[js.length - 1], jsPath = script.src;
-      if(script.getAttribute('merge')) return;
+      var jsPath = document.currentScript ? document.currentScript.src : function(){
+        var js = document.scripts
+        ,last = js.length - 1
+        ,src;
+        for(var i = last; i > 0; i--){
+          if(js[i].readyState === 'interactive'){
+            src = js[i].src;
+            break;
+          }
+        }
+        return src || js[last].src;
+      }();
       return jsPath.substring(0, jsPath.lastIndexOf('/') + 1);
     }()
     
@@ -55,7 +65,7 @@
   }
 
   ,laydate = {
-    v: '5.0.7'
+    v: '5.0.9'
     ,config: {} //全局配置项
     ,index: (window.laydate && window.laydate.v) ? 100000 : 0
     ,path: ready.getPath
@@ -63,7 +73,7 @@
     //设置全局项
     ,set: function(options){
       var that = this;
-      that.config = ready.extend({}, that.config, options);
+      that.config = lay.extend({}, that.config, options);
       return that;
     }
     
@@ -705,7 +715,7 @@
     }
     
     //移除上一个控件
-    that.remove(Class.thisElem); 
+    that.remove(Class.thisElemDate); 
     
     //如果是静态定位，则插入到指定的容器中，否则，插入到body
     isStatic ? options.elem.append(elem) : (
@@ -716,8 +726,8 @@
     that.checkDate().calendar(); //初始校验
     that.changeEvent(); //日期切换
     
-    Class.thisElem = that.elemID;
-    
+    Class.thisElemDate = that.elemID;
+
     typeof options.ready === 'function' && options.ready(lay.extend({}, options.dateTime, {
       month: options.dateTime.month + 1
     }));
@@ -728,7 +738,7 @@
     var that = this
     ,options = that.config
     ,elem = lay('#'+ (prev || that.elemID));
-    if(elem[0] && !elem.hasClass(ELEM_STATIC)){
+    if(!elem.hasClass(ELEM_STATIC)){
       that.checkDate(function(){
         elem.remove();
       });
@@ -1006,8 +1016,8 @@
     //计算当前月第一天的星期
     thisDate.setFullYear(dateTime.year, dateTime.month, 1);
     startWeek = thisDate.getDay();
-
-    prevMaxDate = laydate.getEndDate(dateTime.month, dateTime.year); //计算上个月的最后一天
+    
+    prevMaxDate = laydate.getEndDate(dateTime.month || 12, dateTime.year); //计算上个月的最后一天
     thisMaxDate = laydate.getEndDate(dateTime.month + 1, dateTime.year); //计算当前月的最后一天
     
     //赋值日
@@ -1379,6 +1389,7 @@
   
   //创建指定日期时间对象
   Class.prototype.newDate = function(dateTime){
+    dateTime = dateTime || {};
     return new Date(
       dateTime.year || 1
       ,dateTime.month || 0

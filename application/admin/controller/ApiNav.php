@@ -7,7 +7,7 @@ class ApiNav extends Common{
 	public function navList(){
 		$app_id = input('param.app_id');
 		
-		$AppModel = Loader::model('AppModel');                      //实例化模型
+		$AppModel = new \app\admin\model\App();                      //实例化模型
         $app_list = $AppModel -> getAppList();
         $this -> assign('app_list',$app_list);
 

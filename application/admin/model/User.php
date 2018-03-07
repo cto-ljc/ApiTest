@@ -1,12 +1,11 @@
 <?php
 namespace app\admin\model;
-use app\common\model\BaseUserModel;
 
 use think\Model;
 use think\Db;
 use think\Session;
 
-class UserModel extends BaseUserModel{
+class User extends \app\common\model\User{
 	// 设置当前模型对应的完整数据表名称
     protected $table = 'api_user';
 

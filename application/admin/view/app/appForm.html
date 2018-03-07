@@ -1,60 +1,71 @@
-<div class='layui-tab-content'>
-  	<div class="layui-field-box">
-		<form class="layui-form layui-form-pane1" action="">
-			<div class="layui-form-item">
-				<label class="layui-form-label">app名称:</label>
-				<div class="layui-input-block">
-					<input type="text" name="name" lay-verify='required' value="<?php echo @$app_info['name'];?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
+<div class="layui-field-box">
+	<form class="layui-form layui-form-pane1" action="">
+		<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+			<ul class="layui-tab-title">
+				<li class="layui-this">基本信息</li>					
+				<li>域名信息</li>
+			</ul>
+			<div class="layui-tab-content">
+				<div class="layui-tab-item layui-show">
+					<div class="layui-form-item">
+						<label class="layui-form-label">app名称:</label>
+						<div class="layui-input-block">
+							<input type="text" name="name" lay-verify='required' value="{$app_info['name']|default=''}" required placeholder="" autocomplete="off" class="layui-input">
+							<span class="remark"></span>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">描述:</label>
+						<div class="layui-input-block">
+							<input type="text" name="describe" value="{$app_info['describe']|default=''}" required placeholder="" autocomplete="off" class="layui-input">
+							<span class="remark"></span>
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label">版本:</label>
+						<div class="layui-input-block">
+							<input type="text" name="version" value="{$app_info['version']|default=''}" required placeholder="" autocomplete="off" class="layui-input">
+							<span class="remark"></span>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">排序:</label>
+						<div class="layui-input-block">
+							<input type="text" name="sort" value="{$app_info['sort']|default='100'}" required placeholder="" autocomplete="off" class="layui-input">
+							<span class="remark"></span>
+						</div>
+					</div>					
 				</div>
+				<div class="layui-tab-item">
+					<div class="layui-form-item">
+						<label class="layui-form-label">域名1:</label>
+						<div class="layui-input-block">
+							<input type="text" name="sort" value="" required placeholder="" autocomplete="off" class="layui-input">
+							<span class="remark"></span>
+						</div>
+					</div>
+				</div>				
 			</div>
-			<div class="layui-form-item">
-				<label class="layui-form-label">描述:</label>
-				<div class="layui-input-block">
-					<input type="text" name="describe" value="<?php echo @$app_info['describe'];?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
-				</div>
+		</div> 
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button class="layui-btn" lay-submit lay-filter="*">提交</button>
+				<button class="layui-btn layui-btn-primary">添加域名</button>
 			</div>
-			
-			<div class="layui-form-item">
-				<label class="layui-form-label">版本:</label>
-				<div class="layui-input-block">
-					<input type="text" name="version" value="<?php echo @$app_info['version'];?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
-				</div>
-			</div>
-			<div class="layui-form-item">
-				<label class="layui-form-label">域名:</label>
-				<div class="layui-input-block">
-					<input type="text" name="domain" lay-verify='' value="<?php echo @$app_info['domain'];?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
-				</div>
-			</div>
-			<div class="layui-form-item">
-				<label class="layui-form-label">测试域名:</label>
-				<div class="layui-input-block">
-					<input type="text" name="test_domain" lay-verify='' value="<?php echo @$app_info['test_domain'];?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
-				</div>
-			</div>
-			<div class="layui-form-item">
-				<label class="layui-form-label">排序:</label>
-				<div class="layui-input-block">
-					<input type="text" name="sort" value="<?php echo (@$app_info['sort'] ? @$app_info['sort'] : 100);?>" required placeholder="" autocomplete="off" class="layui-input">
-					<span class="remark"></span>
-				</div>
-			</div>
-			<div class="layui-form-item">
-				<div class="layui-input-block">
-					<button class="layui-btn" lay-submit lay-filter="*">提交</button>
-					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
-				</div>
-			</div>
-		</form>
-	</div>
+		</div>
+	</form>
 </div>
+
 <script>
-layui.use('form', function(){	
+var vue = new Vue({
+	el:'.layui-form',
+	data:{
+		
+	}
+});
+
+layui.use(['form','element'], function(){	
 	var form = layui.form;
 
 	//自定义验证规则

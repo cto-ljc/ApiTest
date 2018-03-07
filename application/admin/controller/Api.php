@@ -10,7 +10,7 @@ class Api extends Common{
 	 */
 	public function apiManage(){
 		$app_id = input('param.app_id',0);		
-		$AppModel = Loader::model('AppModel');                      //实例化模型
+		$AppModel = new \app\admin\model\App();                      //实例化模型
         $app_list_data = $AppModel -> getAppList();
         $app_list = $app_list_data['list']; 
         $this -> assign('app_list',$app_list);

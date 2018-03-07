@@ -1,13 +1,6 @@
 {load href="__STATIC__/X-admin/css/x-admin.css" /} 
-<div class="x-nav">
-    <span class="layui-breadcrumb">
-        <a><cite>首页</cite></a>
-        <a><cite>用户管理</cite></a>
-        <a><cite>用户列表</cite></a>
-    </span>
-    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"  href="javascript:location.replace(location.href);" title="刷新"><i class="layui-icon" style="line-height:30px">ဂ</i></a>
-</div>
-<div class="x-body">
+
+<div class="layui-tab-content">
     <form class="layui-form x-center" action="" >
         <div class="layui-form-pane" style="margin-top: 15px;">
           <div class="layui-form-item">
@@ -28,10 +21,18 @@
         </div> 
     </form>
     <xblock>        
-        <button class="layui-btn" onclick="admin_add('添加用户','adminAdd','600','500')"><i class="layui-icon">&#xe608;</i>添加</button>
+        <button class="layui-btn" onclick="admin_add('添加用户','adminAdd','600','500')">添加</button>
         <span class="x-right" style="line-height:40px">共有数据：88 条</span>
     </xblock>
     <table class="layui-table">
+        <colgroup>
+            <col width="50">
+            <col>
+            <col width="150">
+            <col width="80">
+            <col width="200">
+            <col>
+        </colgroup>
         <thead>
             <tr>
                 <th>ID</th>
@@ -46,39 +47,29 @@
             <tr>
                 <td>{$vo.uid}</td>
                 <td>{$vo.account}</td>                
-                <td>{:date('y-m-d',$vo.reg_time)}</td>
+                <td>{:date('Y-m-d',$vo.reg_time)}</td>
                 <td class="td-status">
                     {switch name="vo.state"}
                         {case value="0"}
-                        <span class="layui-btn layui-btn-normal layui-btn-mini">
+                        <span class="layui-btn layui-btn-normal layui-btn-xs">
                             禁用
                         </span>
                         {/case}
                         {case value="1"}
-                        <span class="layui-btn layui-btn-normal layui-btn-mini">
+                        <span class="layui-btn layui-btn-normal layui-btn-xs">
                             正常
                         </span>
                         {/case}
                         {default /}default
                     {/switch}                    
                 </td>
-                <td class="td-manage">                    
-                    <a title="编辑" href="javascript:;" onclick="edit_user('编辑','{:url(\'editUser\',array('uid' => $vo.uid))}','800','600')"
-                    class="ml-5" style="text-decoration:none">
-                        <i class="layui-icon">&#xe642;</i>
-                    </a>
-                    <a title="修改密码" href="javascript:;" onclick="update_password('修改密码','{:url(\'updatePassword\',array('uid' => $vo.uid))}','800','600')"
-                    class="ml-5" style="text-decoration:none">
-                        <i class="layui-icon">&#xe631;</i>
-                    </a>
-                    <a title="权限" href="javascript:;" onclick="edit_user('权限','{:url(\'power\',array('uid' => $vo.uid))}','800','600')"
-                    class="ml-5" style="text-decoration:none">
-                        <i class="layui-icon">&#xe60a;</i>
-                    </a>
-                    <a title="删除" href="javascript:;" onclick="del_user({$vo.uid})" 
-                    style="text-decoration:none">
-                        <i class="layui-icon">&#xe640;</i>
-                    </a>
+                <td class="td-manage">    
+                    <div class="layui-btn-group">
+                        <div class="layui-btn layui-btn-xs" onclick="edit_user('编辑','{:url(\'editUser\',array('uid' => $vo.uid))}','800','600')">编辑</div>
+                        <div class="layui-btn layui-btn-xs layui-btn-warm" onclick="update_password('修改密码','{:url(\'updatePassword\',array('uid' => $vo.uid))}','800','600')">密码</div>
+                        <div class="layui-btn layui-btn-xs layui-btn-normal" onclick="edit_user('权限','{:url(\'power\',array('uid' => $vo.uid))}','800','600')">权限</div>
+                        <div class="layui-btn layui-btn-xs layui-btn-danger">删除</div>
+                    </div>  
                 </td>
             </tr>
             {/volist}

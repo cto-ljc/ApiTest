@@ -1,0 +1,275 @@
+<style type="text/css">
+.layui-header.header{ background-color: #393d49; border-bottom: 1px solid #009e94;}
+.header .layui-nav{ float: right; }
+.header .logo{ position: absolute; left: 0; color: #c2c2c2; height: 60px; line-height: 60px; padding: 0 20px; font-size: 20px; }
+.header .logo:hover{ color: #efefef; }
+
+.site-demo > iframe{ width: 100%; height: 100%; display: block;}
+
+
+
+</style>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header header">
+        <a class="logo lui-btn" href="{:url('')}">
+            api管理系统
+        </a> 
+        <ul class="layui-nav" lay-filter="header-nav">   
+            <li class="layui-nav-item">
+                <a href="javascript:;">{$user_info['account']}</a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a href="">个人信息</a></dd>
+                    <dd><a href="">切换帐号</a></dd>
+                    <dd><a href="{:url('index/logout')}">退出</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+            <!-- <a href="" title="消息">
+                <i class="layui-icon" style="top: 1px; ">&#xe63a;</i>
+            </a> -->
+            </li>
+            <li class="layui-nav-item" lay-id="help"><a target='_blank'>help</a></li>
+            <li class="layui-nav-item"><a target='_blank' href="{:url('home/index/api')}">首页</a></li>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 侧边菜单栏vue组件    -->
+            <layui-admin-menu-left-item v-bind:nav_array="left_menu"  v-on:increment="set_show_item"></layui-admin-menu-left-item>
+        </div>
+    </div>
+    <div class="layui-body site-demo">
+        <iframe frameborder="0" :src="iframe_url"></iframe>
+        <!-- <div class="layui-tab layui-tab-card site-demo-title" lay-filter="frame-tab" lay-allowclose="true">
+            
+
+            <ul class="layui-tab-title">                    
+            </ul>
+            <div class="layui-tab-content site-demo site-demo-body">                    
+            </div>    
+        </div>-->
+    </div>
+    
+    <div class="site-tree-mobile layui-hide">
+        <i class="layui-icon">
+            &#xe602;
+        </i>
+    </div>
+    <div class="site-mobile-shade">
+    </div>
+</div>
+
+{load href="__STATIC__/common/js/tool.js" /} 
+<script>
+
+//左边菜单栏组件
+Vue.component('layui-admin-menu-left-item', {
+    // 声明 props
+    props: ['nav_array'], 
+    //template:'<div>{{nav_array}}</div>'
+    template: '<ul class="layui-nav layui-nav-tree"  lay-filter="side">\
+                    <li class="layui-nav-item" :class="{\'layui-nav-itemed\':nav.this_menu}" :item-id="index" v-for="(nav,index) in nav_array" v-if="nav.type == \'menu\'" >\
+                        <a class="" href="javascript:;" @click="click_menu(index)">{{nav.name}}<span class="layui-nav-more"></span></a>\
+                        <dl class="layui-nav-child" >\
+                            <dd :item-id="index" :class="{\'layui-this\':item.this_item}" :child-id="child_index" v-for="(item,child_index) in nav.item" @click="click_menu_item(index,child_index)">\
+                                <a href="#9/1" :_href="item.url">{{item.name}}</a>\
+                            </dd>\
+                        </dl>\
+                    </li>\
+                    <li class="layui-nav-item" :class="{\'layui-this\':nav.this_item}"  :item-id="index" v-else @click="click_item(index)">\
+                        <a class="" href="javascript:;" :_href="nav.url">{{nav.name}}</a>\
+                    </li>\
+                </ul>',
+    data:function(){
+        
+    },
+    watch:{
+        
+    },
+    methods:{
+        click_item:function(index){       
+            var item = this.nav_array[index];    
+            var nav_array = this.nav_array;
+            this.$emit('increment',item.id);            
+        },
+        click_menu:function(index){   
+            var nav_array = this.nav_array;
+            nav_array[index].this_menu = nav_array[index].this_menu ? false : true;
+            this.nav_array = new Array();
+            this.nav_array = nav_array;            
+        },
+        click_menu_item:function(index,child_index){      
+            var nav_array = this.nav_array;     
+            var item = nav_array[index].item[child_index];   
+            this.$emit('increment',item.id);       
+        }
+    }
+})
+
+var vue = new Vue({
+    el:'.layui-layout-admin',
+    data:{       
+        menu_array:new Array(),
+        top_menu:new Array(),
+        left_menu:new Array(),
+        iframe_url:''
+    },
+    methods:{         
+        init:function(){
+            //设置默认显示的项目
+            var show_item;
+            for(var i in this.menu_array){
+                if(!show_item && this.menu_array[i].type == 'action'){
+                    this.menu_array[i].this_item = true;
+                    show_item = this.menu_array[i];
+                }
+            }
+            var that = this;
+            //由于layui的加载比vue慢 所以要等待一段时间 在layui加载完以后才能使用它的方法
+            setTimeout(function(){  
+                that.show_tab();
+            },100);
+
+            this.init_top_menu();
+            
+            //初始化左边菜单
+            this.init_left_menu();
+        },    
+        init_top_menu:function(){
+            //初始化头部
+            for(var i in this.menu_array){
+                if(this.menu_array[i].pid == 0){                
+                    this.menu_array[i].this_item = this.top_menu.length == 0 ? true : false;
+                    this.top_menu.push(this.menu_array[i]);
+                }
+            }
+        }, 
+        init_left_menu:function(){    
+            var index = 0;
+            for(var i in this.top_menu){
+                if(this.top_menu[i].this_item == true){
+                    index = i;
+                }
+            }                     
+            
+            var show_item = false;
+
+            var menu_array = $tool.tree(this.menu_array, 0,'pid','id',1);
+
+            var menu_tree = new Array();
+
+            var index_1 = 0;
+            var index_2 = 0;     
+
+            for (var i in menu_array) {        
+                var value = menu_array[i];    
+                var pid = value['pid'];
+                var le = value['le'];    
+                
+                if(le == 1){
+                    index_1 ++;
+                    index_2 = 0;
+                    value.item = new Array();
+                    menu_tree.push(value);
+
+                }else if(le == 2){         
+                    index_2 ++;  
+                    value.item = new Array();
+                    menu_tree[index_1-1]['item'].push(value);
+                }else if(le == 3){
+                    menu_tree[index_1-1]['item'][index_2-1].item.push(value);
+                }
+            }
+
+            this.left_menu = menu_tree[index].item;
+        },
+        set_show_item:function(id){
+            for(var i in this.menu_array){
+                if(this.menu_array[i].type == 'action'){
+                    this.menu_array[i].this_item = this.menu_array[i].id == id ? true : false;
+                }
+            }
+            this.init_left_menu();
+            this.show_tab();
+        },
+        show_tab:function(){          
+            for(var i in this.menu_array){
+                var item = this.menu_array[i];
+                if(item.this_item == true && item.type == 'action'){
+                    vue.iframe_url = item.url;
+                    //
+                }
+            }
+        },        
+    },      
+    watch:{
+        menu_data:function(){
+            console.log('menu_data');
+        }
+        
+    },  
+    mounted:function(){
+        var menu_array = new Array();
+        menu_array = [
+            {id:1,name:'api管理系统',pid:0,type:'menu'},
+            {id:2,name:'项目管理',pid:1,type:'menu'},
+            {id:3,name:'api管理',pid:2,type:'action',url:'{:url('Api/apiManage')}'},
+            {id:4,name:'项目列表',pid:2,type:'action',url:'{:url('App/appList')}'},
+            {id:5,name:'用户管理',pid:1,type:'action',url:'{:url('User/userList')}'},
+        ];
+
+
+        this.menu_array = menu_array;
+        this.init();
+    }
+});
+
+//JavaScript代码区域
+layui.use(['form','element'], function(){
+    
+});
+
+function addTab(id,url,title){        
+    var element = layui.element;
+    if(!element){
+        return;
+    }
+
+    if($('.layui-tab-title li#'+id).length){    //如果不存在该选项卡 则创建 否则切换            
+         var index = $(".layui-tab-title li").index($('.layui-tab-title li#'+id));
+         element.tabDelete('frame-tab', id);  
+    }
+
+    res = element.tabAdd('frame-tab', {
+        title: title
+        ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
+        id:id
+    });
+
+    element.tabChange('frame-tab', $('.layui-tab-title li').length-1);
+
+    var length = $('.layui-tab-title li').length;
+    $('.layui-tab-title li').eq(length - 1).attr('id',id);  
+    
+    element.tabChange('frame-tab', id);   
+}
+
+ /*添加*/
+function help(){
+    layer.open({
+        type: 2,
+        area: ['1200px', '800px'],
+        fix: false, //不固定
+        maxmin: true,
+        shadeClose: true,
+        shade:0.4,
+        title: '使用帮助',
+        content: "{:url('help')}",
+        end: null
+    });    
+}
+</script>
+
+<script type="text/javascript">
+
+</script>

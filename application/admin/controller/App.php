@@ -6,13 +6,12 @@ use \think\Request;
 class App extends Common{
 
 	public function appList(){
-		$AppModel = Loader::model('AppModel');                      //实例化模型
-        $app_list_data = $AppModel -> getAppList();
-        $app_list = $app_list_data['list'];
-        $total = $app_list_data['total'];
-        $this -> assign('app_list',$app_list);
-        $this -> assign('total',$total);
-		return view('appList');
+		$page_size = 15;
+		$AppModel = new \app\admin\model\App();                      //实例化模型
+        $list_data = $AppModel -> getAppList($page_size);
+        
+        $this -> assign('list_data',$list_data);
+		return view('app_list');
 	}
 
 	public function addApp(){
@@ -24,7 +23,7 @@ class App extends Common{
 			$data['test_domain'] = input('post.test_domain');
 			$data['sort'] = input('post.sort');
 			
-			$AppModel = Loader::model('AppModel');                      //实例化模型
+			$AppModel = new \app\admin\model\App();                      //实例化模型
 			if($AppModel -> addApp($data) !== false){
 				json_success('添加成功',array('callback_type' => 2));
 			}else{
@@ -47,7 +46,7 @@ class App extends Common{
 			$data['test_domain'] = input('post.test_domain');
 			$data['sort'] = input('post.sort');
 
-			$AppModel = Loader::model('AppModel');                      //实例化模型
+			$AppModel = new \app\admin\model\App();                      //实例化模型
 			if($AppModel -> editApp($app_id,$data) !== false){
 				json_success('修改成功',array('callback_type' => 2));
 			}else{
@@ -57,7 +56,7 @@ class App extends Common{
 		}else{
 			$app_id = input('param.app_id'); 
 
-			$AppModel = Loader::model('AppModel');                      //实例化模型
+			$AppModel = new \app\admin\model\App();                      //实例化模型
 	        $app_info = $AppModel -> appInfo($app_id);
 			$this -> assign('app_info',$app_info);
 			return view('appForm');
@@ -68,7 +67,7 @@ class App extends Common{
 	public function delApp(){
 		if(request() -> isPost()){
 			$app_id = input('post.app_id'); 
-			$AppModel = Loader::model('AppModel');                      //实例化模型
+			$AppModel = new \app\admin\model\App();                      //实例化模型
 			if($AppModel -> delApp($app_id) !== false){
 				json_success('删除成功',array('callback_type' => 1));
 			}else{

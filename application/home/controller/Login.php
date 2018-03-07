@@ -15,7 +15,7 @@ class Login extends \think\Controller{
 			$account = input('post.account');
 			$password = input('post.password');
 
-			$UserModel = Loader::model('UserModel');                      //实例化模型
+			$UserModel = new \app\admin\model\User();                 //实例化模型
     		if($user_info = $UserModel -> login($account,$password)){
     			json_success('成功');
     		}else{
@@ -38,7 +38,7 @@ class Login extends \think\Controller{
 
             
 
-            $UserModel = Loader::model('UserModel');                      //实例化模型
+            $UserModel = new \app\admin\model\User();                   //实例化模型
             if($user_info = $UserModel -> login($account,$password,$code)){
                 cache('captcha'.request() -> ip(),NULL);
                 json_success('成功');

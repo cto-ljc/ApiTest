@@ -244,7 +244,8 @@ function app_manage(obj){
     // console.log(id);
     //$intop.open('{:url('App/appList',array('app_id' => $app_id))}','项目管理');
 
-    parent.addTab('app_manage','{:url('App/appList',array('app_id' => $app_id))}','项目管理');
+    //parent.addTab('app_manage','{:url('App/appList',array('app_id' => $app_id))}','项目管理');
+    parent.vue.set_show_item(4);
 }
 
 var reload_status = false; 
