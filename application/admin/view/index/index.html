@@ -39,7 +39,7 @@
         </div>
     </div>
     <div class="layui-body site-demo">
-        <iframe frameborder="0" :src="iframe_url"></iframe>
+        <iframe id="body_iframe" frameborder="0" :src="iframe_url"></iframe>
         <!-- <div class="layui-tab layui-tab-card site-demo-title" lay-filter="frame-tab" lay-allowclose="true">
             
 
@@ -196,8 +196,12 @@ var vue = new Vue({
             for(var i in this.menu_array){
                 var item = this.menu_array[i];
                 if(item.this_item == true && item.type == 'action'){
-                    vue.iframe_url = item.url;
-                    //
+                    if(vue.iframe_url == item.url){
+                        body_iframe.contentWindow.location.reload();
+                        console.log(body_iframe);
+                    }else{
+                        vue.iframe_url = item.url;
+                    }           
                 }
             }
         },        
@@ -212,9 +216,9 @@ var vue = new Vue({
         var menu_array = new Array();
         menu_array = [
             {id:1,name:'api管理系统',pid:0,type:'menu'},
-            {id:2,name:'项目管理',pid:1,type:'menu'},
-            {id:3,name:'api管理',pid:2,type:'action',url:'{:url('Api/apiManage')}'},
-            {id:4,name:'项目列表',pid:2,type:'action',url:'{:url('App/appList')}'},
+            // {id:2,name:'项目管理',pid:1,type:'menu'},
+            // {id:3,name:'api管理',pid:2,type:'action',url:'{:url('Api/apiManage')}'},
+            {id:4,name:'项目列表',pid:1,type:'action',url:'{:url('App/appList')}'},
             {id:5,name:'用户管理',pid:1,type:'action',url:'{:url('User/userList')}'},
         ];
 

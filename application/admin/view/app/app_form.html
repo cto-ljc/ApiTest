@@ -2,8 +2,8 @@
 	<form class="layui-form layui-form-pane1" action="">
 		<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
 			<ul class="layui-tab-title">
-				<li class="layui-this">基本信息</li>					
-				<li>域名信息</li>
+				<li class="layui-this" @click="click_base()">基本信息</li>					
+				<li @click="click_domain()">域名信息</li>
 			</ul>
 			<div class="layui-tab-content">
 				<div class="layui-tab-item layui-show">
@@ -38,10 +38,11 @@
 					</div>					
 				</div>
 				<div class="layui-tab-item">
-					<div class="layui-form-item">
-						<label class="layui-form-label">域名1:</label>
-						<div class="layui-input-block">
-							<input type="text" name="sort" value="" required placeholder="" autocomplete="off" class="layui-input">
+					<div class="layui-form-item" v-for="(domain,index) in domain_array">
+						<label class="layui-form-label">域名{{index+1}}:</label>
+						<div class="layui-input-block" style="padding-right: 70px;">
+							<input type="text" v-model="domain_array[index]" required placeholder="如 http://www.api.com" autocomplete="off" class="layui-input">
+							<div class="layui-btn layui-btn-primary" style="position: absolute; right: 0; top: 0;" @click="del_domain(index)"><i class="layui-icon" style="">&#x1006;</i></div>
 							<span class="remark"></span>
 						</div>
 					</div>
@@ -51,7 +52,7 @@
 		<div class="layui-form-item">
 			<div class="layui-input-block">
 				<button class="layui-btn" lay-submit lay-filter="*">提交</button>
-				<button class="layui-btn layui-btn-primary">添加域名</button>
+				<div v-if="form_content=='domain'" class="layui-btn layui-btn-primary" @click="add_domain()">添加域名</div>
 			</div>
 		</div>
 	</form>
@@ -61,7 +62,37 @@
 var vue = new Vue({
 	el:'.layui-form',
 	data:{
+		form_content:'base',
+		domain_array:new Array(),
+		test:'test',
+		app_info:JSON.parse('{:json_encode(@$app_info)}'),
+	},
+	methods:{
+		click_base:function(){
+			vue.form_content = 'base';
+		},
+		click_domain:function(){	
+			if(vue.domain_array.length == 0){
+				this.domain_array.push('http://');
+			}
+			vue.form_content = 'domain';
+		},
+		//添加域名
+		add_domain:function(){
+			this.domain_array.push('http://');
+		},
+		del_domain:function(index){
+			this.domain_array.splice(index,1);
+		},
 		
+	},
+	mounted:function(){
+		if(this.app_info){
+			var domain_array = this.app_info.domain.split(',');
+			domain_array.pop();
+			this.domain_array = domain_array;
+		}
+		//this.domain_array.push('http://');
 	}
 });
 
@@ -105,14 +136,28 @@ layui.use(['form','element'], function(){
 		var field = data.field;
 		var url = "{:url('',input('param.'))}";
 
-		console.log(url);
-		console.log(field);	
-		
+		if(vue.domain_array.length == 0){
+			layer.msg('请至少设置一个api域名');
+			return false;
+		}
+
+		var domain_string = '';
+		for(var i in vue.domain_array){
+			domain_string += vue.domain_array[i]+',';
+		}
+		field.domain = domain_string;
+				
 		//post(field,url);
 		var obj = data.elem;
-		$intop.post(obj,url,field,function(){
-			parent.parent.update_api_manage(false);
-			parent.location.href = document.referrer;			  
+		$intop.post(obj,url,field,function(ret){
+			if(ret.success == true){			
+				parent.layer.msg(ret.msg);	
+				parent.vue.app_list = ret.data.data;
+				var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+				parent.layer.close(index); //再执行关闭 
+			}else{
+				layer.msg(ret.msg);
+			}			
 		});
 
 		return false;

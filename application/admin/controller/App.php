@@ -4,38 +4,45 @@ use \think\Loader;
 use \think\Request;
 
 class App extends Common{
+	protected $page_size = 15;
 
+	//项目列表
 	public function appList(){
-		$page_size = 15;
-		$AppModel = new \app\admin\model\App();                      //实例化模型
-        $list_data = $AppModel -> getAppList($page_size);
+		$app_model = new \app\admin\model\App();                      //实例化模型
+        $list_data = $app_model -> getAppList($this -> page_size);
         
         $this -> assign('list_data',$list_data);
 		return view('app_list');
 	}
 
-	public function addApp(){
+	//添加项目
+	public function add(){
 		if(request() -> isPost()){
 			$data['name'] = input('post.name');
 			$data['version'] = input('post.version');
 			$data['describe'] = input('post.describe');
 			$data['domain'] = input('post.domain');
-			$data['test_domain'] = input('post.test_domain');
 			$data['sort'] = input('post.sort');
 			
-			$AppModel = new \app\admin\model\App();                      //实例化模型
-			if($AppModel -> addApp($data) !== false){
-				json_success('添加成功',array('callback_type' => 2));
+			$app_model = new \app\admin\model\App();                      //实例化模型
+			$id = $app_model -> addApp($data);
+			if($id !== false){
+
+				$app_model = new \app\admin\model\App();                      //实例化模型
+        		$list_data = $app_model -> getAppList($this -> page_size);
+
+				json_success('添加成功',$list_data);
 			}else{
-				json_error($AppModel -> getError());
+				json_error($app_model -> getError());
 			}
 		}else{
 			
-			return view('appForm');
+			return view('app_form');
 		}	
 	}
 
-	public function editApp(){		
+	//编辑项目
+	public function edit(){		
 		if(request() -> isPost()){
 			$app_id = input('param.app_id'); 
 
@@ -43,36 +50,40 @@ class App extends Common{
 			$data['version'] = input('post.version');
 			$data['describe'] = input('post.describe');
 			$data['domain'] = input('post.domain');
-			$data['test_domain'] = input('post.test_domain');
 			$data['sort'] = input('post.sort');
 
-			$AppModel = new \app\admin\model\App();                      //实例化模型
-			if($AppModel -> editApp($app_id,$data) !== false){
-				json_success('修改成功',array('callback_type' => 2));
+			$app_model = new \app\admin\model\App();                      //实例化模型
+			if($app_model -> editApp($app_id,$data) !== false){
+				$app_model = new \app\admin\model\App();                      //实例化模型
+        		$list_data = $app_model -> getAppList($this -> page_size);
+
+				json_success('修改成功',$list_data);
 			}else{
-				json_error($AppModel -> getError());
+				json_error($app_model -> getError());
 			}
 
 		}else{
 			$app_id = input('param.app_id'); 
 
-			$AppModel = new \app\admin\model\App();                      //实例化模型
-	        $app_info = $AppModel -> appInfo($app_id);
+			$app_model = new \app\admin\model\App();                      //实例化模型
+	        $app_info = $app_model -> appInfo($app_id);
 			$this -> assign('app_info',$app_info);
-			return view('appForm');
+			return view('app_form');
 		}		
 	}
 
 	//删除项目
-	public function delApp(){
+	public function del(){
 		if(request() -> isPost()){
 			$app_id = input('post.app_id'); 
-			$AppModel = new \app\admin\model\App();                      //实例化模型
-			if($AppModel -> delApp($app_id) !== false){
+			$app_model = new \app\admin\model\App();                      //实例化模型
+			if($app_model -> delApp($app_id) !== false){
 				json_success('删除成功',array('callback_type' => 1));
 			}else{
-				json_error($AppModel -> getError());
+				json_error($app_model -> getError());
 			}
 		}
 	}
+
+
 }

@@ -1,0 +1,80 @@
+<style type="text/css">
+.nav_form_tab{  background-color: #c7c7c7; color: white; font-size: 25px !important; width: 20px !important; min-width: auto !important; }
+</style>
+
+<div class="layui-tab-content">
+    {$app['name']}
+    <hr >
+    <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="api_nav">
+        <ul class="layui-tab-title">      
+            <li class="layui-this">name</li> 
+            <li class="nav_form_tab">+</li> 
+        </ul>
+        
+        <div class="layui-tab-content" style="padding: 10px;">            
+            <div class="layui-tab-item">                    
+                <div class="nav">
+                    <div class="layui-btn-group">
+                        <button class="layui-btn layui-btn-mini">添加接口</button>
+                        <button class="layui-btn layui-btn-mini layui-btn-warm" >编辑栏目</button>
+                        <button class="layui-btn layui-btn-mini layui-btn-danger" >删除栏目</button>
+                    </div>
+                    <span style='float:right;'>name 接口数量：<span class='right api_count'>23423</span></span>
+                </div>
+                <table class="layui-table" lay-even lay-skin="nob">
+                    <thead>
+                        <tr>
+                            <th>名称</th>                               
+                            <th>排序</th>
+                            <th class="handle">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>                    
+                        <tr>
+                            <td>name</td>
+                            <td>sort</td>
+                            <td class="handle">
+                                <a title="编辑" href="javascript:;" style="text-decoration:none">
+                                    <i class="layui-icon">&#xe642;</i>
+                                </a>
+                                <a title="删除" href="javascript:;" >
+                                    <i class="layui-icon">&#xe640;</i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>    
+            <div class="layui-tab-item">
+                <div class="layui-field-box">
+                    <form class="layui-form layui-form-pane1 nav_form" action="">
+                        <input type="hidden" name="nav_id" value="" placeholder="" autocomplete="off" class="layui-input">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">分类名称:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="name" lay-verify='required' value="<?php echo @$info['name'];?>" required placeholder="" autocomplete="off" class="layui-input">
+                                <span class="remark"></span>
+                            </div>
+                        </div>                        
+                       
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">排序:</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="sort" value="<?php echo (@$info['sort'] ? @$info['sort'] : 100);?>" required placeholder="" autocomplete="off" class="layui-input">
+                                <span class="remark"></span>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="nav_form">提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>           
+        </div>
+    </div>   
+    
+    <div id="page"></div>
+</div>

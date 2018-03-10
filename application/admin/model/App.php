@@ -10,7 +10,7 @@ class App extends Model{
 	 * return $list
 	 */
 	public function getAppList($page_size = 15,$map=[]){
-		$list = $this -> where($map) -> order(['sort' => 'asc']) -> paginate($page_size,'',['query'=>input('get.')]);
+		$list = $this -> where($map) -> order(['sort' => 'asc','id' => 'desc']) -> paginate($page_size,'',['query'=>input('get.')]);
 		return $list;
 	}
 
@@ -31,11 +31,30 @@ class App extends Model{
 	 */
 	public function addApp($data){
 		$map['name'] = $data['name'];
-		if(Db::name('app') -> where($map) -> count()){
+		if($this -> where($map) -> count()){
 			$this -> error = '该项目已存在';
 			return false;
 		}
-		return Db::name('app') -> insert($data);
+
+		Db::startTrans();
+		try{
+		    $app_id = $this -> insertGetId($data);
+
+		    Db::name('api_item') -> insert([
+		    	'app_id' => $app_id,
+		    	'name' => '默认分类',
+		    	'sort' => 1
+		    ]);
+
+		    // 提交事务
+		    Db::commit();    
+		    return true;
+		} catch (\Exception $e) {
+		    // 回滚事务
+		    Db::rollback();
+		    $this -> error = $e -> getMessage();
+		    return false;
+		}
 	}
 
 	/*
@@ -45,24 +64,26 @@ class App extends Model{
 	 * return bool 修改结果
 	 */
 	public function editApp($app_id,$data){
-		$map['id'] = $app_id;				
-		return Db::name('app') -> where($map) -> update($data);
+		$map['id'] = ['<>',$app_id];	
+		$map['name'] = $data['name'];
+		if($this -> where($map) -> count()){
+			$this -> error = '该项目已存在';
+			return false;
+		}			
+		return $this -> where(['id' => $app_id]) -> update($data);
 	}
 
 	/*
 	 * 删除app项目
-	 * @param int $app_id 
+	 * @param int $id 
 	 * return bool 删除结果
 	 */
-	public function delApp($app_id){
+	public function delApp($id){
 		// 启动事务		
 		Db::startTrans();
 		try{
-			Db::name('app') -> where('id',$app_id) -> delete();
-			Db::name('nav_item') -> where('app_id',$app_id) -> delete();
-			Db::name('api') -> where('app_id',$app_id) -> delete();
-			Db::name('api_param') -> where('app_id',$app_id) -> delete();
-		    // 提交事务
+			Db::name('app') -> where('id',$id) -> delete();
+			// 提交事务
 		    Db::commit(); 
 		    return true;
 		} catch (\Exception $e) {

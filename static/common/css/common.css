@@ -1,1 +1,3 @@
 .lui-btn{ -webkit-transition-duration: .2s;   transition-duration: .2s; cursor: pointer; -webkit-user-select:none;  -moz-user-select:none;  -ms-user-select:none;  user-select:none;}
+.btn{ -webkit-transition-duration: .2s;   transition-duration: .2s; cursor: pointer; -webkit-user-select:none;  -moz-user-select:none;  -ms-user-select:none;  user-select:none;}
+[v-cloak] { display: none }

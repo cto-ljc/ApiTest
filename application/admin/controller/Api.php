@@ -5,6 +5,26 @@ use \think\Request;
 use \think\Db;
 
 class Api extends Common{	
+	public function index($app_id){
+		$app = Db::name('app') -> where(['id' => $app_id]) -> find();
+
+		if(!$app){
+			echo '项目不存在';
+			die;
+		}
+
+		$api_item = Db::name('app') -> where(['app_id' => $app_id]) -> order('sort asc') -> select();
+
+		$api_array = Db::name('api') -> where(['app_id' => $app_id]) -> order('sort asc') -> select();
+
+		$this -> assign([
+			'app' => $app,
+			'api_item' => $api_item,
+		]);
+
+		return view();
+	}
+
 	/*
 	 * api管理页
 	 */

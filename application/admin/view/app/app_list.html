@@ -2,50 +2,96 @@
 <div class="layui-tab-content">
     <xblock>
         <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon">&#xe640;</i>批量删除</button> -->
-        <button class="layui-btn" onclick="banner_add('添加项目','{:url('addApp')}','800','600')">添加</button>
-        <span class="x-right" style="line-height:40px">共有项目：{$list_data -> total()} </span>
+        <button class="layui-btn" @click="add()">添加</button>
+        <span class="x-right" style="line-height:40px" v-cloak>共有项目：{{app_list.length}} </span>
     </xblock>
     <table class="layui-table">
+        <colgroup>
+            <col width="40">
+            <col width="60">
+            <col >
+            <col >
+            <col width="140">
+            <col>
+        </colgroup>
         <thead>
             <tr>
                 <th><input type="checkbox" name="" value=""></th>
                 <th>ID</th>
-                <!-- <th>logo</th> -->
                 <th>名称</th>
-                <th>描述</th>
-                <th>接口域名</th>
-                <th>本地域名</th>
+                <th>描述</th>                
                 <th>操作</th>
             </tr>
         </thead>
-        <tbody>
-            {volist name="list_data" id="vo"}
-            <tr>
+        <tbody>            
+            <tr v-for="(item,index) in app_list" v-cloak>
                 <td><input type="checkbox" value="1" name=""></td>
-                <td>{$vo['id']}</td>
-                <!-- <td><img src="./images/banner.png" width="200" alt=""></td> -->
-                <td >{$vo.name}</td>
-                <td >{$vo.describe}</td>
-                <td >{$vo.domain}</td>
-                <td>{$vo.test_domain}</td>
-                <td class="td-manage">                    
-                    <a title="编辑" href="javascript:;" onclick="$intop.open('{:url('editApp',array(\'app_id\' => $vo.id))}','编辑')"
-                    class="ml-5" style="text-decoration:none">
-                        <i class="layui-icon">&#xe642;</i>
-                    </a>
-                    <a title="删除" href="javascript:;" onclick="banner_del(this,{$vo.id})" 
-                    style="text-decoration:none">
-                        <i class="layui-icon">&#xe640;</i>
-                    </a>
+                <td>{{item.id}}</td>
+                <td >{{item.name}}</td>
+                <td >{{item.describe}}</td>                
+                <td class="td-manage">     
+                    <div class="layui-btn-group">
+                        <div class="layui-btn layui-btn-xs layui-btn-normal" @click="api('{:url('api/index')}'+'?app_id='+item.id)">API</div>
+                        <div class="layui-btn layui-btn-xs" @click="edit('{:url('edit')}'+'?page='+{:input('page',0)}+'&app_id='+item.id)">编辑</div>
+                        <div class="layui-btn layui-btn-xs layui-btn-danger" @click="del(item.id,index)">删除</div>
+                    </div>  
                 </td>
             </tr>
-            {/volist}
         </tbody>
     </table>
     {$list_data -> render()}
     <div id="page"></div>
 </div>
 <script>
+
+var vue = new Vue({
+    el:'.layui-tab-content',
+    data:{
+        app_list:JSON.parse('{:json_encode($list_data)}').data,       
+    },
+    methods:{
+        add:function(){
+            var url = '{:url('add')}'+'?page='+'{:input('page',0)}';
+            $intop.open(url,'添加项目');
+        },
+        edit:function(url){            
+            $intop.open(url,'编辑项目');
+        },
+        del:function(id,index){
+            layer.confirm('确认要删除吗？',function(confirm_index){
+                var url = "{:url('del')}";
+                var data = {};
+                data['app_id'] = id;
+                $.ajax({
+                    type:"post",
+                    url:url,
+                    data:data,
+                    dataType:'json',
+                    success: function (ret) {      
+                        if (ret.success) {          
+                            vue.app_list.splice(index,1);                
+                        } 
+                        layer.msg(ret.msg); 
+                    },
+                    error:function(ret){
+                        layer.alert('网络错误',{title:''});             
+                    },
+                    beforeSend: function(xhr){               
+                        layer.load();                                    
+                    },
+                    complete: function(){  
+                        layer.closeAll('loading');   
+                        layer.close(confirm_index);       
+                    },                    
+                })          
+            });
+        },
+        api:function(url){
+            parent.vue.iframe_url = url;
+        }
+    }
+});
+
 layui.use(['laydate','element','laypage','layer'], function(){
     $ = layui.jquery;//jquery
     laydate = layui.laydate;//日期插件
@@ -109,22 +155,6 @@ function banner_start(obj,id){
 function banner_edit (title,url,id,w,h) {
     x_admin_show(title,url,w,h); 
 }
-/*删除*/
-function banner_del(obj,id){
-    layer.confirm('确认要删除吗？',function(index){
-        var url = "{:url('delApp')}";
-        var data = {};
-        data['app_id'] = id;
-        post(data,url,function(ret){    //发异步删除数据
-            var msg = ret.msg;
-            if(ret.success == true){
-                $(obj).parents("tr").remove();
-                parent.update_api_manage(false);     //更新api_manage页面
-            }                
-            layer.msg(msg,{icon:1,time:1000});
-        });
-        
-    });
-}
+
 </script>
 

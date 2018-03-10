@@ -1,0 +1,7 @@
+/* 分页样式 */
+.pagination{ float: right; }
+.pagination{ display: inline-block;  vertical-align: middle;  margin: 10px 0;  font-size: 0; }
+.pagination > li{  display: inline-block;  vertical-align: middle;  padding: 0;  border: 1px solid #e2e2e2;  height: 28px;
+    line-height: 28px;  margin: 0 -1px;  background-color: #fff;  color: #333;  font-size: 12px; width: 35px; text-align: center;}
+.pagination > li.active{ background-color: #009688; color: #fff;}
+.pagination > li > a { display: block; }
