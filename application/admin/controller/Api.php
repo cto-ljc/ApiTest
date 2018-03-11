@@ -13,13 +13,14 @@ class Api extends Common{
 			die;
 		}
 
-		$api_item = Db::name('app') -> where(['app_id' => $app_id]) -> order('sort asc') -> select();
+		$api_item_array = Db::name('api_item') -> where(['app_id' => $app_id]) -> order('sort asc') -> select();
 
 		$api_array = Db::name('api') -> where(['app_id' => $app_id]) -> order('sort asc') -> select();
 
 		$this -> assign([
 			'app' => $app,
-			'api_item' => $api_item,
+			'api_item_array' => $api_item_array,
+			'api_array' => $api_array,
 		]);
 
 		return view();

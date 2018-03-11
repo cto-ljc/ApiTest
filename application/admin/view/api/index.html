@@ -3,23 +3,23 @@
 </style>
 
 <div class="layui-tab-content">
-    {$app['name']}
+    项目：{$app['name']}
     <hr >
     <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="api_nav">
         <ul class="layui-tab-title">      
-            <li class="layui-this">name</li> 
+            <li class="layui-this" v-for="(item,index) in api_item_array" v-cloak>{{item.name}}</li> 
             <li class="nav_form_tab">+</li> 
         </ul>
         
         <div class="layui-tab-content" style="padding: 10px;">            
-            <div class="layui-tab-item">                    
+            <div class="layui-tab-item layui-show">                    
                 <div class="nav">
                     <div class="layui-btn-group">
-                        <button class="layui-btn layui-btn-mini">添加接口</button>
-                        <button class="layui-btn layui-btn-mini layui-btn-warm" >编辑栏目</button>
-                        <button class="layui-btn layui-btn-mini layui-btn-danger" >删除栏目</button>
+                        <button class="layui-btn layui-btn-xs">添加接口</button><!-- 
+                        <button class="layui-btn layui-btn-xs layui-btn-warm" >编辑栏目</button>
+                        <button class="layui-btn layui-btn-xs layui-btn-danger" >删除栏目</button> -->
                     </div>
-                    <span style='float:right;'>name 接口数量：<span class='right api_count'>23423</span></span>
+                    <span style='float:right;'>接口数量：<span class='right api_count'>{{this_api.length}}</span></span>
                 </div>
                 <table class="layui-table" lay-even lay-skin="nob">
                     <thead>
@@ -29,17 +29,20 @@
                             <th class="handle">操作</th>
                         </tr>
                     </thead>
-                    <tbody>                    
-                        <tr>
-                            <td>name</td>
-                            <td>sort</td>
+                    <tbody>   
+                        <colgroup>
+                            <col >
+                            <col width="60">
+                            <col width="120">
+                        </colgroup>                 
+                        <tr v-cloak v-for="(item,index) in this_api">
+                            <td>{{item.name}}</td>
+                            <td>{{item.sort}}</td>
                             <td class="handle">
-                                <a title="编辑" href="javascript:;" style="text-decoration:none">
-                                    <i class="layui-icon">&#xe642;</i>
-                                </a>
-                                <a title="删除" href="javascript:;" >
-                                    <i class="layui-icon">&#xe640;</i>
-                                </a>
+                                <div class="layui-btn-group">
+                                    <div class="layui-btn layui-btn-xs" @click="edit_api(index)">编辑</div>
+                                    <div class="layui-btn layui-btn-xs layui-btn-danger" @click="del_api(index)">删除</div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -78,3 +81,39 @@
     
     <div id="page"></div>
 </div>
+
+<script type="text/javascript">
+var vue = new Vue({
+    el:'.layui-tab-content',
+    data:{
+        api_item_array:JSON.parse('{:json_encode($api_item_array)}'),
+        api_array:JSON.parse('{:json_encode($api_array)}'),
+        this_api:new Array(),
+    },
+    methods:{
+        init:function(){
+
+        },
+        init_api:function(index){
+            var item = this.api_item_array[index];
+            var api = new Array();
+            for(var i in this.api_array){
+                if(this.api_array[i].item_id == item.id){
+                    api.push(this.api_array[i]);
+                }
+            }
+            this.this_api = api;
+            console.log(api);
+        },
+        edit_api:function(index){
+            console.log(index);
+        },
+        del_api:function(index){
+            console.log(index);
+        },
+    },
+    mounted:function(){
+        this.init_api(0);
+    }
+});
+</script>

@@ -223,7 +223,7 @@ function login(){
 		success: function (ret) {
 			var msg = ret.msg;
 			if(ret.success == true){
-				window.location.href = "{:url('index/main')}";
+				window.location.href = "{:url('index/index')}";
 				console.log('登录成功');
 			}else{
 				alert(msg);
