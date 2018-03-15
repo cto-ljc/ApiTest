@@ -109,62 +109,34 @@ Vue.component('layui-admin-menu-left-item', {
 var vue = new Vue({
     el:'.layui-layout-admin',
     data:{       
-        menu_array:new Array(),
-        top_menu:new Array(),
-        left_menu:new Array(),
-        iframe_url:''
+        menu_array:[],
+        top_menu_index:0,
+        action_id:0,
+        iframe_url:'',
+        //top_menu:new Array(),
+        //left_menu:new Array(),
     },
-    methods:{         
-        init:function(){
-            //设置默认显示的项目
-            var show_item;
-            for(var i in this.menu_array){
-                if(!show_item && this.menu_array[i].type == 'action'){
-                    this.menu_array[i].this_item = true;
-                    show_item = this.menu_array[i];
-                }
-            }
-            var that = this;
-            //由于layui的加载比vue慢 所以要等待一段时间 在layui加载完以后才能使用它的方法
-            setTimeout(function(){  
-                that.show_tab();
-            },100);
-
-            this.init_top_menu();
-            
-            //初始化左边菜单
-            this.init_left_menu();
-        },    
-        init_top_menu:function(){
-            //初始化头部
-            for(var i in this.menu_array){
-                if(this.menu_array[i].pid == 0){                
-                    this.menu_array[i].this_item = this.top_menu.length == 0 ? true : false;
-                    this.top_menu.push(this.menu_array[i]);
-                }
-            }
-        }, 
-        init_left_menu:function(){    
-            var index = 0;
-            for(var i in this.top_menu){
-                if(this.top_menu[i].this_item == true){
-                    index = i;
-                }
-            }                     
-            
+    computed:{        
+        menu_tree:function(){
+            var menu_array = this.menu_array;  
             var show_item = false;
 
-            var menu_array = $tool.tree(this.menu_array, 0,'pid','id',1);
-
+            menu_array = $tool.tree(menu_array, 0,'pid','id',1);
+            
             var menu_tree = new Array();
 
             var index_1 = 0;
-            var index_2 = 0;     
+            var index_2 = 0;                
 
             for (var i in menu_array) {        
                 var value = menu_array[i];    
                 var pid = value['pid'];
                 var le = value['le'];    
+
+                if(menu_array[i].type == 'action'){
+                    this.action_id = this.action_id == 0 ? menu_array[i].id : this.action_id;
+                    menu_array[i].this_item = this.action_id == menu_array[i].id ? true : false;
+                }
                 
                 if(le == 1){
                     index_1 ++;
@@ -181,38 +153,39 @@ var vue = new Vue({
                 }
             }
 
-            this.left_menu = menu_tree[index].item;
-        },
-        set_show_item:function(id){
-            for(var i in this.menu_array){
-                if(this.menu_array[i].type == 'action'){
-                    this.menu_array[i].this_item = this.menu_array[i].id == id ? true : false;
-                }
+            for(var i in menu_tree){
+                menu_tree[i].this_item = i == this.top_menu_index ? true : false;                
             }
-            this.init_left_menu();
+            
+            return menu_tree;
+        },
+        top_menu:function(){            
+            return this.menu_tree;
+        },
+        left_menu:function(){ 
+            return this.menu_tree[this.top_menu_index].item;
+        },
+    },
+    methods:{         
+        click_top_menu:function(index){
+            this.top_menu_index = index;
+        },
+       
+        set_show_item:function(id){
+            this.action_id = id;
+            
             this.show_tab();
         },
-        show_tab:function(){          
+        show_tab:function(){ 
             for(var i in this.menu_array){
                 var item = this.menu_array[i];
-                if(item.this_item == true && item.type == 'action'){
-                    if(vue.iframe_url == item.url){
-                        body_iframe.contentWindow.location.reload();
-                        console.log(body_iframe);
-                    }else{
-                        vue.iframe_url = item.url;
-                    }           
+                if(item.id == this.action_id){                    
+                    this.iframe_url = item.url;                    
                 }
             }
         },        
-    },      
-    watch:{
-        menu_data:function(){
-            console.log('menu_data');
-        }
-        
-    },  
-    mounted:function(){
+    },          
+    created:function(){
         var menu_array = new Array();
         menu_array = [
             {id:1,name:'api管理系统',pid:0,type:'menu'},
@@ -222,9 +195,11 @@ var vue = new Vue({
             {id:5,name:'用户管理',pid:1,type:'action',url:'{:url('User/userList')}'},
         ];
 
+        this.menu_array = menu_array;        
+    },
 
-        this.menu_array = menu_array;
-        this.init();
+    mounted:function(){
+        this.show_tab();
     }
 });
 

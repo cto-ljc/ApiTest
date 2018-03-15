@@ -7,19 +7,21 @@
     <hr >
     <div class="layui-tab layui-tab-card" style="height: auto;" lay-filter="api_nav">
         <ul class="layui-tab-title">      
-            <li class="layui-this" v-for="(item,index) in api_item_array" v-cloak>{{item.name}}</li> 
-            <li class="nav_form_tab">+</li> 
+            <li class="btn" :class="{'layui-this':api_item_index == index}" v-for="(item,index) in api_item_array" v-cloak @click="click_api_item(index)">{{item.name}}</li> 
+            <li class="nav_form_tab btn" @click="add_api_item()">+</li> 
         </ul>
         
         <div class="layui-tab-content" style="padding: 10px;">            
             <div class="layui-tab-item layui-show">                    
                 <div class="nav">
                     <div class="layui-btn-group">
-                        <button class="layui-btn layui-btn-xs">添加接口</button><!-- 
-                        <button class="layui-btn layui-btn-xs layui-btn-warm" >编辑栏目</button>
-                        <button class="layui-btn layui-btn-xs layui-btn-danger" >删除栏目</button> -->
+                        <button class="layui-btn layui-btn-xs layui-btn-warm" @click="edit_api_item()">编辑栏目</button>
+                        <button class="layui-btn layui-btn-xs layui-btn-danger" @click="del_api_item()" v-if="api_item_array.length > 1">删除栏目</button> 
                     </div>
-                    <span style='float:right;'>接口数量：<span class='right api_count'>{{this_api.length}}</span></span>
+                    <span style='float:right;'>
+                        <span>接口数量：<span class='right api_count'>{{this_api.length}}</span></span>
+                        <button class="layui-btn layui-btn-xs" style="margin-left: 5px;" @click="add_api()">添加接口</button>
+                    </span>
                 </div>
                 <table class="layui-table" lay-even lay-skin="nob">
                     <thead>
@@ -83,37 +85,201 @@
 </div>
 
 <script type="text/javascript">
-var vue = new Vue({
+var vm = new Vue({
     el:'.layui-tab-content',
     data:{
+        app_id:{$app_id},
         api_item_array:JSON.parse('{:json_encode($api_item_array)}'),
         api_array:JSON.parse('{:json_encode($api_array)}'),
-        this_api:new Array(),
+        api_item_index:0,
     },
-    methods:{
-        init:function(){
-
-        },
-        init_api:function(index){
-            var item = this.api_item_array[index];
+    computed:{
+        this_api:function(){
+            var item = this.api_item_array[this.api_item_index];         
+            
             var api = new Array();
             for(var i in this.api_array){
-                if(this.api_array[i].item_id == item.id){
+                if(this.api_array[i].api_item_id == item.id){
                     api.push(this.api_array[i]);
                 }
-            }
-            this.this_api = api;
-            console.log(api);
+            }            
+            return api;
+        }
+    },
+    methods:{        
+        add_api:function(){
+            var item = this.api_item_array[this.api_item_index];
+            var url = '{:url('api/add')}'+'?api_item_id='+item.id;
+            $intop.open(url,'添加接口');
         },
-        edit_api:function(index){
-            console.log(index);
+        edit_api:function(api_index){
+            var api = this.this_api[api_index];
+            var url = '{:url('api/edit')}' + '?api_id='+api.id;
+            $intop.open(url,'编辑接口：'+api.name);
         },
-        del_api:function(index){
-            console.log(index);
+        del_api:function(api_index){
+            var that = this;
+            var api = this.this_api[api_index];
+            layer.confirm('确认删除“'+api.name+'”?', { title:''}, function(index){
+                var data = {};
+                data.id = api.id;
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    url:'{:url('api/del')}',
+                    data:data,
+                    success:function(ret){
+                        layer.msg(ret.msg);
+
+                        if(ret.success != true){
+                            return;
+                        }                       
+
+                        for(var i in that.api_array){
+                            if(that.api_array[i].id == api.id){
+                                that.api_array.splice(i,1);
+                            }
+                        } 
+                
+                        layer.close(index);
+                    },
+                    error:function(){
+                        layer.msg('网络错误');
+                    },
+                    beforeSend:function(){
+                        layer.load();
+                    },
+                    complete:function(){
+                        layer.closeAll('loading');
+                    }
+                }); 
+            });
         },
+
+        //添加栏目
+        add_api_item:function(){
+            var that = this;
+            
+            layer.prompt({
+                title:'添加栏目',
+            },function(value, index, elem){
+                var data = {};
+                data.name = value;
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    url:'{:url('apiitem/add')}'+'?app_id='+that.app_id,
+                    data:data,
+                    success:function(ret){
+                        layer.msg(ret.msg);
+
+                        if(ret.success != true){
+                            return;
+                        }
+                        that.api_item_array.push(ret.data);
+                        layer.close(index);
+                    },
+                    error:function(){
+                        layer.msg('网络错误');
+                    },
+                    beforeSend:function(){
+                        layer.load();
+                    },
+                    complete:function(){
+                        layer.closeAll('loading');
+                    }
+                });                
+            });
+        },
+        //编辑栏目
+        edit_api_item:function(){
+            var that = this;
+            var item = that.api_item_array[that.api_item_index];
+
+            layer.prompt({
+                title:'编辑栏目',
+                value:item.name,
+            },function(value, index, elem){
+                var data = {};
+                data.name = value;
+                data.api_item_id = item.id;
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    url:'{:url('apiitem/edit')}',
+                    data:data,
+                    success:function(ret){
+                        layer.msg(ret.msg);
+
+                        if(ret.success != true){
+                            return;
+                        }
+
+                        that.api_item_array.splice(that.api_item_index,1,ret.data);            
+                        layer.close(index);
+                    },
+                    error:function(){
+                        layer.msg('网络错误');
+                    },
+                    beforeSend:function(){
+                        layer.load();
+                    },
+                    complete:function(){
+                        layer.closeAll('loading');
+                    }
+                });                
+            });
+        },
+        //删除栏目
+        del_api_item:function(){
+            var that = this;
+            var item = that.api_item_array[that.api_item_index];
+
+            layer.confirm('确认删除“'+item.name+'”?', { title:''}, function(index){
+                var data = {};
+                data.api_item_id = item.id;
+                $.ajax({
+                    type:'post',
+                    dataType:'json',
+                    url:'{:url('apiitem/del')}',
+                    data:data,
+                    success:function(ret){
+                        layer.msg(ret.msg);
+
+                        if(ret.success != true){
+                            return;
+                        }                        
+                        
+                        that.api_item_array.splice(that.api_item_index,1);   
+
+                        //如果删除的项是最后一项 则api_item_index向前移一位
+                        if(that.api_item_index == that.api_item_array.length ){
+                            that.api_item_index = that.api_item_array.length - 1;
+                        }  
+
+                        layer.close(index);
+                    },
+                    error:function(){
+                        layer.msg('网络错误');
+                    },
+                    beforeSend:function(){
+                        layer.load();
+                    },
+                    complete:function(){
+                        layer.closeAll('loading');
+                    }
+                });    
+            });
+        },
+        //点击api栏目
+        click_api_item:function(index){
+            this.api_item_index = index;            
+        }
     },
     mounted:function(){
-        this.init_api(0);
+        
     }
 });
+
+layui.use(['layer'],function(){});
 </script>
