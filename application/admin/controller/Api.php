@@ -34,6 +34,7 @@ class Api extends Common{
 		if(request() -> isPost()){
 			$post = input('post.');
 			$api = $post['api'];
+			$param = @$post['param'] ? $post['param'] : [];
 
 			if(\think\Db::name('api') -> where(['name' => $api['name'],'api_item_id' => $api_item_id]) -> count()){
 				json_error('api名称重复');
@@ -45,6 +46,17 @@ class Api extends Common{
 			$api['app_id'] = $app_id;
 			$api_id = \think\Db::name('api') -> insertGetId($api);
 
+			foreach ($param as $key => $value) {
+				if(Db::name('api_param') -> where(['api_id' => $api_id,'name' => $value['name']]) -> count()){
+					json_error('参数'.$value['name'].'重复');
+				}
+
+				$value['app_id'] = $app_id;
+				$value['api_item_id'] = $api_item_id;
+				$value['api_id'] = $api_id;					
+				Db::name('api_param') -> insert($value);
+			}
+
 			$api_data = \think\Db::name('api') -> where(['id' => $api_id]) -> find();
 
 			json_success('添加成功',[
@@ -52,6 +64,9 @@ class Api extends Common{
 				'api' => $api_data
 			]);
 		}else{
+			$api_model = new \app\admin\model\Api();
+			$encrypt_array = $api_model -> getEncryptArray();
+
 			$api = [
 				'name' => '',
 				'path' => '',
@@ -60,7 +75,8 @@ class Api extends Common{
 
 			$this -> assign([
 				'api' => $api,
-				'param' => []
+				'param' => [],
+				'encrypt_array' => $encrypt_array,
 			]);
 			return view('form');
 		}
@@ -72,28 +88,58 @@ class Api extends Common{
 	public function edit($api_id){
 		if(request() -> isPost()){
 			$post = input('post.');
-			$api = $post['api'];
+			$api_data = $post['api'];
+			$param = @$post['param'] ? $post['param'] : [];
 
-			$api_item_id = \think\Db::name('api') -> where(['id' => $api_id]) -> value('api_item_id');
+			$api = \think\Db::name('api') -> where(['id' => $api_id]) -> find();
+			$api_item_id = $api['api_item_id'];
+			$app_id = $api['app_id'];
 
-			if(\think\Db::name('api') -> where(['name' => $api['name'],'api_item_id' => $api_item_id,'id' => ['<>',$api_id]]) -> count()){
+			if(\think\Db::name('api') -> where(['name' => $api_data['name'],'api_item_id' => $api_item_id,'id' => ['<>',$api_id]]) -> count()){
 				json_error('api名称重复');
 			}			
 			
-			$api_id = \think\Db::name('api') -> where(['id' => $api_id]) -> update($api);
-
+			\think\Db::name('api') -> where(['id' => $api_id]) -> update($api_data);
 			$api_data = \think\Db::name('api') -> where(['id' => $api_id]) -> find();
+
+			foreach ($param as $key => $value) {
+				if(@$value['id']){
+					if(@$value['del']){	//删除
+						Db::name('api_param') -> where(['id' => $value['id']]) -> delete();
+					}else{
+						if(Db::name('api_param') -> where(['api_id' => $api_id,'name' => $value['name'],'id' => ['<>',$value['id']]]) -> count()){
+							json_error('参数'.$value['name'].'重复');
+						}
+						Db::name('api_param') -> where(['id' => $value['id']]) -> update($value);
+					}					
+				}else{
+					if(Db::name('api_param') -> where(['api_id' => $api_id,'name' => $value['name']]) -> count()){
+						json_error('参数'.$value['name'].'重复');
+					}
+
+					$value['app_id'] = $app_id;
+					$value['api_item_id'] = $api_item_id;
+					$value['api_id'] = $api_id;					
+					Db::name('api_param') -> insert($value);
+				}
+			}
+
 
 			json_success('添加成功',[
 				'action' => 'edit',
 				//'api' => $api_data
 			]);
 		}else{
+			$api_model = new \app\admin\model\Api();
+			$encrypt_array = $api_model -> getEncryptArray();
+
 			$api = \think\Db::name('api') -> where(['id' => $api_id]) -> find();
+			$param = \think\Db::name('api_param') -> where(['api_id' => $api_id]) -> select();
 
 			$this -> assign([
 				'api' => $api,
-				'param' => []
+				'param' => $param,
+				'encrypt_array' => $encrypt_array,
 			]);
 			return view('form');
 		}
@@ -108,5 +154,14 @@ class Api extends Common{
 				json_error('删除失败');
 			}			
 		}		
+	}
+
+	/**
+	 * 更新排序
+	 * @return [type] [description]
+	 */
+	public function updateSort($id,$sort){
+		\think\Db::name('api') -> where(['id' => $id]) -> setField('sort',$sort);
+		json_success('修改成功');
 	}
 }

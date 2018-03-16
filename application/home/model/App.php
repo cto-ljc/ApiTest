@@ -4,7 +4,7 @@ namespace app\home\model;
 use think\Model;
 use think\Db;
 
-class AppModel extends Model{
+class App extends Model{
 	// 设置当前模型对应的完整数据表名称
     protected $table = 'api_app';
 
@@ -13,7 +13,7 @@ class AppModel extends Model{
 	 * @param int $uid 用户id
 	 */
 	public function getAppList($uid){		
-		$app_ids = db('user') -> where(array('uid' => $uid)) -> value('app_ids');
+		$app_ids = Db::name('user') -> where(array('uid' => $uid)) -> value('app_ids');
         $app_ids = explode(',',$app_ids,-1);
 		$map['id'] = array('in',$app_ids);
 		$field = 'a.*';

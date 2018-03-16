@@ -7,7 +7,19 @@ use think\Loader;
 
 class User extends Common{
     public function index()   {
-        $this->redirect('main');
+
+        $user_model = new \app\home\model\User();   
+        $user_info = $user_model -> userInfo($this -> uid);
+
+        $app_model = new \app\home\model\App();
+        $app_list = $app_model -> getAppList($this -> uid);  //app项目列表
+
+        $this -> assign([
+            'user_info' => $user_info,
+            'app_list' => $app_list
+        ]);
+
+        return view();
     }
 
     /*

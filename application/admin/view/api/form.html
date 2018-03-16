@@ -62,7 +62,7 @@
                         <tr>
                             <th>名称</th>   
                             <th>备注</th>
-                            <th>是否缓存</th>         
+                            <th>页面缓存</th>         
                             <th>加密</th>             
                             <th>默认值</th>        
                             <th>排序</th>
@@ -72,25 +72,25 @@
                         </tr>
                     </thead>
                     <tbody>     
-                		<tr id="" param_id="" class='param'>
-                            <th><input class="input" name='name' placeholder='参数名' value=""></th>   
-                            <th><input class="input" name='remark' placeholder='备注' value=""></th>
+                		<tr class='param' v-for="(item,index) in param" v-if="!item.del">
+                            <th><input class="input" v-model='item.name' placeholder='参数名' value=""></th>   
+                            <th><input class="input" v-model='item.remark' placeholder='备注' value=""></th>
                             <th>
-                            	<select name='storage'>	                            		
+                            	<select v-model='item.storage'>	                            		
                         			<option value="0" selected>不缓存</option>
                             		<option value="1" >缓存</option>
                             	</select>
                             </th>         
                             <th>
-                            	<select name='encrypt'>
-                            		<option value="" >加密方式</option>                            		
+                            	<select v-model='item.encrypt' >
+                            		<option :value="value" v-for="(option,value) in encrypt_array" >{{option}}</option>                            		
                             	</select>
                             </th>             
-                            <th><input class="input" name='value' placeholder='无' value=""></th>        
-                            <th><input class="input" name='sort' placeholder='排序' value=""></th>
+                            <th><input class="input" v-model='item.value' placeholder='无' value=""></th>        
+                            <th><input class="input" v-model='item.sort' placeholder='排序' value=""></th>
                             <th class="handle">
                             	<!-- <button class="layui-btn layui-btn-mini save" >保存</button> -->
-                            	<button class="layui-btn layui-btn-xs layui-btn-danger" @click="del_param()">删除</button>
+                            	<button class="layui-btn layui-btn-xs layui-btn-danger" @click="del_param(index)">删除</button>
                             </th>
                         </tr>
                     </tbody>
@@ -104,12 +104,46 @@
 var vm = new Vue({
 	el:'.layui-tab-content',
 	data:{
+		encrypt_array:JSON.parse('{:json_encode($encrypt_array)}'),
 		api:JSON.parse('{:json_encode(@$api)}'),
-		param:JSON.parse('{:json_encode(@$param)}'),
+		param:JSON.parse('{:json_encode(@$param)}'),		
+	},
+	mounted:function(){
+		console.log(this.param);
 	},
 	methods:{
+		//添加参数
+		add_param:function(){
+			var param = {
+				sort:100,
+				storage:1,
+				encrypt:'normal'
+			};
+			this.param.push(param);
+		},
+		//删除参数
+		del_param:function(index){
+			var param = this.param[index];
+			if(param.id){
+				param.del = true;
+				this.param.splice(index,1,param);
+			}else{
+				this.param.splice(index,1);
+			}			
+		},
+		//参数完整性检测
+		param_check:function(){
+			for(var i in this.param){
+				var param = this.param[i];
+				if(param.name == ''){
+					layer.msg('参数名称不能为空');
+					return false;
+				}
+			}
+			return true;
+		},
 		//保存
-		save:function(){
+		save:function(){			
 			var that = this;
 			if(this.api.name == ''){
 				layer.msg("请填写api名称");
@@ -120,8 +154,13 @@ var vm = new Vue({
 				return;
 			}
 
+			if(!this.param_check()){
+				return;
+			}
+
 			var data = {};
-			data.api = this.api;			
+			data.api = this.api;	
+			data.param = this.param;		
 
 			var url = "{:url('',input())}";
 			$.ajax({
@@ -130,6 +169,7 @@ var vm = new Vue({
 				url:url,
 				data:data,
 				success:function(ret){
+					console.log(ret);
 					parent.layer.msg(ret.msg);
 					if(ret.success != true){
 						return ;
@@ -138,8 +178,8 @@ var vm = new Vue({
 						parent.vm.api_array.push(ret.data.api);						
 					}else{												
 						for(var i in parent.vm.api_array){
-							if(parent.vm.api_array[i].id = that.api.id){
-								parent.vm.api_array.splice(i,1,that.api);
+							if(parent.vm.api_array[i].id == that.api.id){
+								parent.vm.api_array.splice(i,1,that.api);								
 							}
 						}
 					}			
@@ -162,62 +202,7 @@ var vm = new Vue({
 });
 
 layui.use(['form','element'], function(){	
-	//修改参数时 将参数行设置为修改状态
-	$("#param_table tr.param input,#param_table tr.param select").change(function(){
-    	$(this).parents('tr.param').addClass('update_param');
-    	$(this).removeClass('warn');
-  	});
 
-	//获得焦点时去除警告提示
-	$("#param_table tr.param input,#param_table tr.param select").on('click',function(){    	
-    	$(this).removeClass('warn');
-  	});
-
-	var form = layui.form;
-
-	//自定义验证规则
-	form.verify({
-		title: function(value){
-		  	if(value.length < 5){
-		    	return '标题也太短了吧';
-		  	}
-		}
-		,pass: [/(.+){6,12}$/, '密码必须6到12位']
-	});
-
-
-	//事件监听
-	form.on('select', function(data){
-		console.log(data);
-	});
-
-	form.on('select(aihao)', function(data){
-		console.log(data);
-	});
-
-	form.on('checkbox', function(data){
-		console.log(data.elem.checked);
-	});
-
-	form.on('switch', function(data){
-		console.log(data);
-	});
-
-	form.on('radio', function(data){
-		console.log(data);
-	});
-
-	//监听提交
-	form.on('submit(*)', function(data){
-		var field = data.field;
-		var url = "{:url('',input('param.'))}";
-
-		console.log(url);
-		console.log(field);	
-		
-		post(field,url);
-		return false;
-	});
   
 });
 

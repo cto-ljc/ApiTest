@@ -16,12 +16,7 @@
         </a> 
         <ul class="layui-nav" lay-filter="header-nav">   
             <li class="layui-nav-item">
-                <a href="javascript:;">{$user_info['account']}</a>
-                <dl class="layui-nav-child"> <!-- 二级菜单 -->
-                    <dd><a href="">个人信息</a></dd>
-                    <dd><a href="">切换帐号</a></dd>
-                    <dd><a href="{:url('index/logout')}">退出</a></dd>
-                </dl>
+                <a href="javascript:;">{$user_info['account']}</a>                
             </li>
             <li class="layui-nav-item">
             <!-- <a href="" title="消息">
@@ -30,6 +25,7 @@
             </li>
             <li class="layui-nav-item" lay-id="help"><a target='_blank'>help</a></li>
             <li class="layui-nav-item"><a target='_blank' href="{:url('home/index/api')}">首页</a></li>
+            <li class="layui-nav-item"><a target='_blank' href="{:url('index/logout')}">退出</a></li>
         </ul>
     </div>
     <div class="layui-side layui-bg-black">

@@ -26,4 +26,10 @@ class Index extends Common{
     public function help(){
         return view();
     }
+
+    //升级程序
+    public function update(){
+
+
+    }
 }

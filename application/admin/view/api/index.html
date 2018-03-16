@@ -34,12 +34,12 @@
                     <tbody>   
                         <colgroup>
                             <col >
-                            <col width="60">
+                            <col width="120">
                             <col width="120">
                         </colgroup>                 
                         <tr v-cloak v-for="(item,index) in this_api">
                             <td>{{item.name}}</td>
-                            <td>{{item.sort}}</td>
+                            <td><input style="width: 80px; text-align: center; border-radius: 10px;" type="text" :value="item.sort" @change="update_sort(item.id,$event)"></td>
                             <td class="handle">
                                 <div class="layui-btn-group">
                                     <div class="layui-btn layui-btn-xs" @click="edit_api(index)">编辑</div>
@@ -50,34 +50,6 @@
                     </tbody>
                 </table>
             </div>    
-            <div class="layui-tab-item">
-                <div class="layui-field-box">
-                    <form class="layui-form layui-form-pane1 nav_form" action="">
-                        <input type="hidden" name="nav_id" value="" placeholder="" autocomplete="off" class="layui-input">
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">分类名称:</label>
-                            <div class="layui-input-block">
-                                <input type="text" name="name" lay-verify='required' value="<?php echo @$info['name'];?>" required placeholder="" autocomplete="off" class="layui-input">
-                                <span class="remark"></span>
-                            </div>
-                        </div>                        
-                       
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">排序:</label>
-                            <div class="layui-input-block">
-                                <input type="text" name="sort" value="<?php echo (@$info['sort'] ? @$info['sort'] : 100);?>" required placeholder="" autocomplete="off" class="layui-input">
-                                <span class="remark"></span>
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <div class="layui-input-block">
-                                <button class="layui-btn" lay-submit lay-filter="nav_form">提交</button>
-                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>           
         </div>
     </div>   
     
@@ -103,6 +75,18 @@ var vm = new Vue({
                     api.push(this.api_array[i]);
                 }
             }            
+
+            for(var i in api){
+                for(var j = i*1+1;j < api.length; j++){
+                    var item = [];
+                    if(api[i].sort > api[j].sort){
+                        item = api[i];
+                        api[i] = api[j];
+                        api[j] = item;
+                    }
+                }
+            }
+
             return api;
         }
     },
@@ -274,6 +258,45 @@ var vm = new Vue({
         //点击api栏目
         click_api_item:function(index){
             this.api_item_index = index;            
+        },
+        //修改排序
+        update_sort:function(id,e){
+            var that = this;
+            
+            var sort = e.target.value;
+            var data = {};
+            data.id = id;
+            data.sort = sort;
+
+            var url = '{:url('api/updateSort')}';
+
+            $.ajax({
+                url:url,
+                type:'post',
+                dataType:'json',
+                data:data,
+                success:function(ret){
+                    console.log(ret);
+                    layer.msg(ret.msg);
+                    if(ret.success == false){
+                        return;
+                    }
+
+                    for(var i in that.api_array){
+                        if(that.api_array[i].id == id){
+                            that.api_array[i].sort = sort;
+                        }
+                    }
+                },
+                beforeSend:function(){
+                    layer.load();
+                },
+                complete:function(){
+                    layer.closeAll('loading');
+                }
+            });
+
+            
         }
     },
     mounted:function(){

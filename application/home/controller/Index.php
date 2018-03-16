@@ -7,7 +7,7 @@ use think\Loader;
 
 class Index extends \think\Controller{
     public function index()   {
-        
+        echo session('uid');
     }
 
     //api测试页
