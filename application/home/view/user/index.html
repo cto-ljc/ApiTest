@@ -26,6 +26,7 @@
                     </dl>
                 </li>
             </ul>
+            
             <!-- <a class="logo" href="./index.html">
                 X-admin v1.0
             </a> -->
@@ -41,13 +42,13 @@
         </div>
     </div>
    <div class="layui-side layui-bg-black">
-        <div class="layui-side-scroll">
-            <ul class="layui-nav layui-nav-tree site-demo-nav" lay-filter="side">
-                <li class="layui-nav-item">
-                    <a class="" href="javascript:;"> {menu.name}<span class="layui-nav-more"></span></a>
+        <div class="layui-side-scroll">            
+            <ul class="layui-nav layui-nav-tree" lay-filter="side" v-cloak>
+                <li class="layui-nav-item" v-for="(item,item_index) in left_menu">
+                    <a class="" href="javascript:;">{{item.name}}<span class="layui-nav-more"></span></a>
                     <dl class="layui-nav-child">                       
-                        <dd>
-                            <a href="#">{item['name']}</a>
+                        <dd v-for="(api,api_index) in item.item" @click="addTab(api)">
+                            <a href="#">{{api.name}}</a>
                         </dd>
                     </dl>                            
                 </li>
@@ -82,7 +83,10 @@ var vm = new Vue({
     el:'.layui-layout',
     data:{
         app_list:JSON.parse('{:json_encode($app_list)}'),
-        app_id:0
+        app_id:0,
+        api_item_array:[],
+        api_array:[],
+        domain:''
     },
     computed:{
         app_name:function(){
@@ -93,7 +97,29 @@ var vm = new Vue({
                 }
             }
             return name;
-        }
+        },
+        left_menu:function(){
+            var menu = [];
+            for(var i in this.api_item_array){
+                var item = this.api_item_array[i];
+                menu.push(item);
+                menu[i].item = [];
+                for(var j in this.api_array){                    
+                    if(this.api_array[j].api_item_id == item.id){
+                        menu[i].item.push(this.api_array[j]);
+                    }
+                }
+            }
+            setTimeout(function() {
+                var element = layui.element;
+                element.render('nav');;
+            }, 10);
+
+            if(menu.length && menu[0].item.length){
+                console.log(menu[0].item[0].id);
+            }
+            return menu;
+        }        
     },
     methods:{
         choice_app:function(index){
@@ -102,11 +128,77 @@ var vm = new Vue({
                     this.app_id = this.app_list[i].id;
                 }
             }
+        },
+        addTab:function(api){
+            var id = api.id;
+            var url = '{:url('user/api')}'+'?api_id='+api.id;
+            var title = api.name;
+
+            var element = layui.element;
+
+            if($('.layui-tab-title li#'+id).length){    //如果不存在该选项卡 则创建 否则切换            
+                 var index = $(".layui-tab-title li").index($('.layui-tab-title li#'+id));
+                 element.tabDelete('frame-tab', id);  
+            }
+
+            res = element.tabAdd('frame-tab', {
+                title: title
+                ,content: '<iframe frameborder="0" src="'+url+'" class="x-iframe"></iframe>',
+                id:id
+            });
+
+            element.tabChange('frame-tab', $('.layui-tab-title li').length-1);
+
+            var length = $('.layui-tab-title li').length;
+            $('.layui-tab-title li').eq(length - 1).attr('id',id);  
+            
+            element.tabChange('frame-tab', id);   
         }
     },
     mounted:function(){
         this.app_id = this.app_list.length ? this.app_list[0].id : 0;
         console.log(this.app_list);
+    },
+    watch:{        
+        app_id:function(){
+            var that = this;
+            this.api_item_array = [];
+            this.api_array = [];
+
+            var url = '{:url('user/app')}';
+            var data = {};
+            data.id = this.app_id;
+            $.ajax({
+                url:url,
+                data:data,
+                type:'post',
+                dataType:'json',
+                success:function(ret){
+                    console.log(ret);
+                    if(ret.success != true){
+                        return;
+                    }
+
+                    that.api_item_array = ret.data.api_item_array;
+                    that.api_array = ret.data.api_array;
+                },
+                error:function(){
+
+                },
+                beforeSend: function(xhr){          
+                    if("undefined" != typeof layer){
+                        layer.load(); 
+                    }     
+                                                       
+                },
+                complete: function(){  
+                    if("undefined" != typeof layer){
+                        layer.closeAll('loading');        
+                    }
+                },       
+            });
+            console.log(this.app_id);
+        }
     },
 });
 
@@ -127,7 +219,7 @@ function change_app(app_id){
 
 //JavaScript代码区域
 layui.use(['form','element'], function(){
-    var element = layui.element;
+    //var element = layui.element;
   
     //init_side();
     //监听导航点击

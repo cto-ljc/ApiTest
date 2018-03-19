@@ -1,11 +1,13 @@
 <script src="__STATIC__/common/js/md5.js"></script>
+<script src="__STATIC__/common/js/base64.js"></script>
 <script src="__STATIC__/home/api/json.js"></script>
 <link rel="stylesheet" href="__STATIC__/home/api/json.css" media="all">
 <style>
-.layui-input-block input {
+/*.layui-input-block input,.layui-input-block .layui-unselect.layui-form-select {
     width: 500px;    
     display: inline-block;
-}
+}*/
+.layui-input-inline{ width: 400px; }
 .remark{     color: #9e9797;    margin-left: 10px; }
 </style>
 <style>
@@ -17,29 +19,45 @@
 	  	<div class="layui-field-box">
 			<form class="layui-form layui-form-pane1" action="">
 				<div class="layui-form-item">
+					<label class="layui-form-label">测试域名:</label>
+					<div class="layui-input-inline">
+						<select class="layui-select" v-model="domain" lay-filter="domain">
+							<option v-for="(item,index) in domain_array">{{item}}</option>
+						</select>
+					</div>
+					<label class="layui-form-label">请求方式:</label>
+					<div class="layui-input-inline">
+						<select class="layui-select" v-model="request_type" lay-filter="request_type">
+							<option>post</option>
+							<option>get</option>
+						</select>
+					</div>
+					<label class="layui-form-label">请求端:</label>
+					<div class="layui-input-inline">
+						<select class="layui-select" v-model="request_mode" lay-filter="request_mode">
+							<option>js</option>
+							<option>curl</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item">
 					<label class="layui-form-label">请求路径:</label>
-					<div class="layui-input-block">
-						<input type="text" name="api_url" value="{$app_info.domain}{$api.url}" required placeholder="" autocomplete="off" class="layui-input">					
-						<div class="layui-inline" style=" line-height: 21px; padding: 0 0 0px 10px;">                        
-                            <input type="checkbox" name="api_domain_online" value='true' lay-skin="switch" lay-filter="domain" title="开关">
-                        </div>          
-                        <span class="remark">切换地址</span>         
+					<div class="layui-input-inline">
+						<input type="text" name="api_url" v-model="api.path" required placeholder="" autocomplete="off" class="layui-input">				
 					</div>
+					<div class="layui-form-mid layui-word-aux">{{domain}}{{api.path}}</div>
 				</div>
-				{volist name="api_param" id="vo"}
-				<div class="layui-form-item">
-					<label class="layui-form-label">{$vo['name']}</label>
-					<div class="layui-input-block">
+				<div class="layui-form-item" v-for="(param,index) in api_param" v-cloak>
+					<label class="layui-form-label">{{param.name}}</label>
+					<div class="layui-input-inline">
+						<input type="text" value="" v-model="param.value" placeholder="" autocomplete="off" class="layui-input">
+					</div>
+					<div class="layui-form-mid layui-word-aux">{{param.remark}}</div>
+				</div>
 						
-						<input type="text" value="{$vo['value']}" name="{$vo['name']}" placeholder="" autocomplete="off" class="layui-input {$vo['class']}" encrypt="{$vo['encrypt']}">
-												
-						<span class="remark">{$vo['remark']}</span>
-					</div>
-				</div>
-				{/volist}				
 				<div class="layui-form-item">
 					<div class="layui-input-block">
-						<button class="layui-btn" lay-submit lay-filter="api_submit">提交</button>
+						<div class="layui-btn" @click="sumbit()">提交</div>
 						<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 					</div>
 				</div>
@@ -110,6 +128,81 @@
 </div>
 <script>
 
+var vm = new Vue({
+	el:'.layui-tab-content',
+	data:{
+		app:JSON.parse('{:json_encode($app)}'),
+		api:JSON.parse('{:json_encode($api)}'),
+		api_param:JSON.parse('{:json_encode($api_param)}'),
+		domain:'',
+		request_mode:'',
+		request_type:'',
+	},
+	mounted:function(){
+		this.request_mode = window.localStorage.getItem('request_mode') ? window.localStorage.getItem('request_mode') : 'js';
+		this.request_type = window.localStorage.getItem('request_type'+this.api.id) ? window.localStorage.getItem('request_type'+this.api.id) : 'post';
+
+		for(var i in this.api_param){
+			var key = 'param_value_'+ this.app.id + this.api_param[i].name;
+			var value = window.localStorage.getItem(key);
+			this.api_param[i].value = value ? value : this.api_param[i].value;
+		}
+	},
+	computed:{
+		domain_array:function(){
+            var domain_array = [];
+            domain_string = this.app.domain;
+            domain_array = domain_string.split(",");
+            domain_array.pop();
+
+            var key = 'app_'+ this.app.id + '_domain';
+			this.domain = window.localStorage.getItem(key);
+            
+            this.domain = this.domain ? this.domain : this.domain = domain_array[0];            
+            
+            return domain_array;
+        },
+	},
+	methods:{
+		sumbit:function(){
+			var data = {};
+
+			for(var i in this.api_param){
+				var param = this.api_param[i];
+				var value = param.value;
+
+				//保存输入缓存
+				var key = 'param_value_'+ this.app.id + this.api_param[i].name;
+				window.localStorage.setItem(key,value);
+
+				switch(param.encrypt){
+				case 'md5':
+					value = hex_md5(value);
+					break;
+				case 'base64':
+					var b = new Base64();  
+        			value = b.encode(value); 
+					break;
+				default:
+					break;
+				}		
+
+				data[param.name] = value;
+			}
+
+			switch(this.request_mode){
+			case "js":
+			 	break;
+			case "curl":
+				layer.msg('curl提交功能正在开发中');
+			 	break;
+			}
+
+			console.log(data);
+		},		
+	},
+});
+
 //localStorage支持验证
 function localStorageCheck(){
 	if(!window.localStorage){
@@ -136,7 +229,7 @@ function initialize(){
 }
 
 function api_storage_key(param_name){
-	var app_id = "{$app_info['id']}";	//当前接口	
+	var app_id = "{$app['id']}";	//当前项目	
 	return app_id + '_' + param_name;
 }
 
@@ -157,33 +250,22 @@ layui.use(['form','element'], function(){
 		,pass: [/(.+){6,12}$/, '密码必须6到12位']
 	});
 
-
-	//事件监听
-	form.on('select', function(data){
-		console.log(data);
+	form.on('select(domain)', function(data){
+		var key = 'app_'+ vm.app.id + '_domain';
+		window.localStorage.setItem(key,data.value);
+		vm.domain = data.value;
 	});
 
-	form.on('select(aihao)', function(data){
-		console.log(data);
+	form.on('select(request_mode)', function(data){
+		var key = 'request_mode';
+		window.localStorage.setItem(key,data.value);
+		vm.request_mode = data.value;
 	});
 
-	form.on('checkbox', function(data){
-		console.log(data.elem.checked);
-	});
-
-	form.on('switch(domain)', function(data){
-		var checked = $(data.elem).attr('checked');
-		if(checked == 'checked'){
-			var domain = "{$app_info.test_domain}";			
-		}else{
-			var domain = "{$app_info.domain}";
-		}
-		var url  = domain + "{$api.url}";
-		$('input[name="api_url"]').val(url);
-	});
-
-	form.on('radio', function(data){
-		console.log(data);
+	form.on('select(request_type)', function(data){
+		var key = 'request_type'+vm.api.id;
+		window.localStorage.setItem(key,data.value);
+		vm.request_type = data.value;
 	});
 
 	//监听提交

@@ -22,6 +22,22 @@ class User extends Common{
         return view();
     }
 
+    /**
+     * 获取app信息
+     * @return [type] [description]
+     */
+    public function app($id){
+        if(request() -> isPost()){
+            $api_item_array = \think\Db::name('api_item') -> where(['app_id' => $id]) -> order('sort asc') -> select();
+            $api_array = \think\Db::name('api') -> where(['app_id' => $id]) -> order('sort asc') -> select();
+
+            json_success('请求成功',[
+                'api_item_array' => $api_item_array,
+                'api_array' => $api_array
+            ]);
+        }
+    }
+
     /*
      * 主框架
      */
@@ -84,30 +100,16 @@ class User extends Common{
     }
 
     //api测试页
-    public function api($api_id = 0){
-        $AppModel = new \app\admin\model\App();                      //实例化模型
-        $app_info = $AppModel -> appInfo($this -> app_id);          //app项目详情
-        $domain_type = Session::get('domain_type');
-        if($domain_type == 2){
-            $app_info['domain'] =  $app_info['test_domain'];
-        }
-        
-        $api = Db::name('api') -> where(array('id' => $api_id)) -> find(); 
-        
-        $map['api_id'] = $api_id;
-        $api_param = Db::name('api_param') -> where($map) -> order('sort','asc') -> select(); 
-        //处理参数
-        foreach($api_param as $key => $value){
-            $value['class'] = '';
-            if($value['storage'] == 1){
-                $value['class'] .= ' storage';
-            }            
-            $api_param[$key] = $value;
-        }
+    public function api($api_id = 0){    
+        $api = Db::name('api') -> where(['id' => $api_id]) -> find();                 
+        $api_param = Db::name('api_param') -> where(['api_id' => $api_id]) -> order('sort','asc') -> select(); 
+        $app = Db::name('app') -> where(['id' => $api['app_id']]) -> find();
 
-        $this -> assign('app_info',$app_info);
-        $this -> assign('api',$api);
-        $this -> assign('api_param',$api_param);           
+        $this -> assign([
+            'api' => $api,
+            'api_param' => $api_param,
+            'app' => $app
+        ]);
         
         return view();        
         
