@@ -28,8 +28,8 @@
 					<label class="layui-form-label">请求方式:</label>
 					<div class="layui-input-inline">
 						<select class="layui-select" v-model="request_type" lay-filter="request_type">
-							<option>post</option>
-							<option>get</option>
+							<option>POST</option>
+							<option>GET</option>
 						</select>
 					</div>
 					<label class="layui-form-label">请求端:</label>
@@ -140,7 +140,7 @@ var vm = new Vue({
 	},
 	mounted:function(){
 		this.request_mode = window.localStorage.getItem('request_mode') ? window.localStorage.getItem('request_mode') : 'js';
-		this.request_type = window.localStorage.getItem('request_type'+this.api.id) ? window.localStorage.getItem('request_type'+this.api.id) : 'post';
+		this.request_type = window.localStorage.getItem('request_type'+this.api.id) ? window.localStorage.getItem('request_type'+this.api.id) : 'POST';
 
 		for(var i in this.api_param){
 			var key = 'param_value_'+ this.app.id + this.api_param[i].name;
@@ -165,6 +165,7 @@ var vm = new Vue({
 	},
 	methods:{
 		sumbit:function(){
+			var that = this;
 			var data = {};
 
 			for(var i in this.api_param){
@@ -192,6 +193,35 @@ var vm = new Vue({
 
 			switch(this.request_mode){
 			case "js":
+				$.ajax({
+					type:that.request_type,
+					dataType:'json',
+					url:that.domain+that.api.path,
+					success:function(ret){
+						console.log(data);
+						var json_data = JSON.stringify(data);
+						$('#RawJson').val(json_data);	
+						//$id("RawJson").innerHTML = ret.data;
+						
+						try{
+					    	var json = JSON.parse(json_data);
+					    	//Process();	
+					    	layer.msg('请求成功');
+						}catch(e){
+							layer.msg('JSON数据格式不正确');							
+						}
+					},
+					error:function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+					},
+					beforeSend: function(xhr){          
+	                    layer.load();                                
+	                },
+	                complete: function(){  
+	                    layer.closeAll('loading');        
+	                },       
+				});
+
 			 	break;
 			case "curl":
 				layer.msg('curl提交功能正在开发中');
@@ -199,7 +229,7 @@ var vm = new Vue({
 			}
 
 			console.log(data);
-		},		
+		},	
 	},
 });
 
