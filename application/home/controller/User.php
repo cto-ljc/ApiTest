@@ -123,36 +123,30 @@ class User extends Common{
 
         $msg = '';        
 
-        $param = input('post.');
+        $request_type = input('post.request_type');
+        $url = input('post.url');
 
-        $o="";
-        foreach ($param as $k=>$v)  {
-            if($k!="api_url"){                
-               $o.= "$k=".urlencode($v)."&"; 
-            }           
-        }
-
-        $curlPost = substr($o,0,-1);
-        $url = $param['api_url']; 
+        $param = input('post.param');
+        $param = json_decode($param);
+        
         $ch = curl_init();//初始化curl  
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $curlPost);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $request_type);
+        //curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $param);
         curl_setopt($ch, CURLOPT_HTTPHEADER, []);
         $data = curl_exec($ch);//运行curl  
         curl_close($ch);  
-        //echo($data);
 
-        json_success('成功',$data);
+        echo $data;
     }
 
     public function logout(){
         session(null);
-        $this->redirect('index/index');
+        $this->redirect('index/api');
     }
 
     //css测试

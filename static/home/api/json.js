@@ -1,6 +1,5 @@
 window.SINGLE_TAB = "  ";
-window.ImgCollapsed = "/static/home/api/img/Collapsed.gif";
-window.ImgExpanded = "/static/home/api/img/Expanded.gif";
+
 window.QuoteKeys = true;
 function $id(id){ return document.getElementById(id); }
 function IsArray(obj) {

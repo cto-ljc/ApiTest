@@ -143,7 +143,7 @@ function login_submit(obj){
 	    		layer.msg(ret.msg,{	    			
 	    			time: 1000
 	    		},function(){
-	    			var url = "{:url('User/main')}";
+	    			var url = "{:url('User/index')}";
 	    			localStorage.setItem('password_error','false');
 	    			window.location = url;
 	    		});  

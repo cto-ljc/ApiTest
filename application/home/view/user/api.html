@@ -30,6 +30,13 @@
 						<select class="layui-select" v-model="request_type" lay-filter="request_type">
 							<option>POST</option>
 							<option>GET</option>
+							<!-- <option>PUT</option>
+							<option>DELETE</option>
+							<option>HEAD</option>
+							<option>TRACE</option>
+							<option>PATCH</option>
+							<option>OPTIONS</option>
+							<option>TEST</option> -->
 						</select>
 					</div>
 					<label class="layui-form-label">请求端:</label>
@@ -128,6 +135,7 @@
 </div>
 <script>
 
+
 var vm = new Vue({
 	el:'.layui-tab-content',
 	data:{
@@ -166,17 +174,16 @@ var vm = new Vue({
 	methods:{
 		sumbit:function(){
 			var that = this;
-			var data = {};
+			var param = {};
 
 			for(var i in this.api_param){
-				var param = this.api_param[i];
-				var value = param.value;
+				var value = this.api_param[i].value;
 
 				//保存输入缓存
 				var key = 'param_value_'+ this.app.id + this.api_param[i].name;
 				window.localStorage.setItem(key,value);
 
-				switch(param.encrypt){
+				switch(this.api_param[i].encrypt){
 				case 'md5':
 					value = hex_md5(value);
 					break;
@@ -188,23 +195,32 @@ var vm = new Vue({
 					break;
 				}		
 
-				data[param.name] = value;
+				param[this.api_param[i].name] = value;
 			}
 
 			switch(this.request_mode){
 			case "js":
+				// axios({
+				// 	method: that.request_type,
+				// 	url: that.domain+that.api.path,
+				// 	data: {param},
+
+				// });
+				// return;
 				$.ajax({
 					type:that.request_type,
 					dataType:'json',
 					url:that.domain+that.api.path,
+					data:param,
 					success:function(ret){
-						console.log(data);
-						var json_data = JSON.stringify(data);
+						console.log(ret);
+						var json_data = JSON.stringify(ret);
+						console.log(json_data);
 						$('#RawJson').val(json_data);	
-						//$id("RawJson").innerHTML = ret.data;
 						
 						try{
 					    	var json = JSON.parse(json_data);
+					    	Process();	
 					    	//Process();	
 					    	layer.msg('请求成功');
 						}catch(e){
@@ -224,8 +240,42 @@ var vm = new Vue({
 
 			 	break;
 			case "curl":
-				layer.msg('curl提交功能正在开发中');
-			 	break;
+				var url = "{:url('apiPost')}";
+
+				var data = {};
+				data.request_type = that.request_type;
+				data.url = that.domain+that.api.path;
+				data.param = JSON.stringify(param);
+
+				$.ajax({
+					type:'post',
+					dataType:'json',
+					url:url,
+					data:data,
+					success:function(ret){
+						var json_data = JSON.stringify(ret);
+						$('#RawJson').val(json_data);	
+						
+						try{
+					    	var json = JSON.parse(json_data);
+					    	Process();	
+					    	layer.msg('请求成功');
+						}catch(e){
+							layer.msg('JSON数据格式不正确');							
+						}
+					},
+					error:function(jqXHR, textStatus, errorThrown){
+						console.log(jqXHR);
+					},
+					beforeSend: function(xhr){          
+	                    layer.load();                                
+	                },
+	                complete: function(){  
+	                    layer.closeAll('loading');        
+	                },       
+				});
+
+				break;
 			}
 
 			console.log(data);
@@ -397,34 +447,6 @@ function api_callback(ret){
 
 
 
-
-//字段加密处理
-function field_encrypt(field){
-	$("input.storage[encrypt != 'normal']").each(function(){
-		var val = $(this).val();
-		var key = $(this).attr('name');
-		var encrypt = $(this).attr('encrypt');
-		switch(encrypt){
-		case 'md5':
-			var val = hex_md5(val);
-			break;
-		case 'base64':
-			break;
-		}		
-		
-		field[key] = val;
-	});
-	return field;
-}
-
-function save_api_param(field_data){
-
-	for(var key in field_data){
-		var storage_key = api_storage_key(key); 
-		var storage_value = field_data[key];
-		window.localStorage.setItem(storage_key,storage_value);		
-	}
-}
 
 function get_api_param(){
 
