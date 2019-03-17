@@ -8,7 +8,8 @@
           <div class="logout btn" @click="logout">退出</div>
         </div>
         <div v-else class="user">
-          <div class="btn" @click="login_form_visible = true; $refs['login'] ? $refs['login'].resetFields() : '';">登录</div>
+          <!-- <div class="btn" @click="login_form_visible = true; $refs['login'] ? $refs['login'].resetFields() : '';">登录</div> -->
+          <div class="btn" @click="$refs['login_form'].visible = true">登录</div>
           <div class="btn" @click="reg_form_visible = true; $refs['reg'] ? $refs['reg'].resetFields() : '';">注册</div>
         </div>
       </div>
@@ -22,20 +23,7 @@
         <router-view ref="child"/>
       </div>
     </el-main>
-
-    <el-dialog :visible.sync="login_form_visible" :close-on-click-modal="false" class="login-dialog" title="用户登录" width="400px">
-      <el-form ref="login" :model="login_form" :rules="login_rules" label-position="left" label-width="55px">
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="login_form.email" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="login_form.password" type="password" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <mu-button full-width class="btn" color="primary" @click="login">确 定</mu-button>
-      </div>
-    </el-dialog>
+    <login ref="login_form" @close="close_login_form"/>
 
     <el-dialog :visible.sync="reg_form_visible" :close-on-click-modal="false" class="reg-dialog" title="用户注册" width="400px">
       <el-form ref="reg" :model="reg_form" :rules="reg_rules" label-position="left" label-width="65px">
@@ -64,25 +52,15 @@
 </template>
 <script>
 import crypto from 'crypto'
+import Login from '@/components/form/login'
 export default {
+  components: {
+    Login
+  },
   data() {
     return {
       // 登录
       login_form_visible: false,
-      login_form: {
-        email: 'cto-ljc@qq.com',
-        password: '123456'
-      },
-      login_rules: {
-        email: [
-          { required: true, message: '请填写邮箱', trigger: 'blur' },
-          { type: 'email', message: '邮箱格式不正确', trigger: 'blur' }
-        ],
-        password: [
-          { required: true, message: '请填写密码', trigger: 'blur' },
-          { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
-        ]
-      },
 
       // 注册
       reg_form_visible: false,
@@ -123,6 +101,9 @@ export default {
     this.init()
   },
   methods: {
+    close_login_form(data) {
+      this.login_form_visible = false
+    },
     login() {
       this.$refs['login'].validate((valid) => {
         if (!valid) {
@@ -243,15 +224,13 @@ export default {
     },
     // 获取数据接口
     get_data() {
-      this.$request.post('/api/index/main').then(response => {
-        var res = response.data
-        if (res.success === false) {
+      this.$request.post('/api/index/getUserInfo').then(res => {
+        const user = res.data.user
+        if (!user) {
           return
         }
-        var user = res.data.user_info
         this.user = user
         this.$store.commit('set_user', user)
-
         this.$refs.child.init()
       })
     },
