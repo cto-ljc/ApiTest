@@ -28,7 +28,7 @@ export const constantRouterMap = [
   { path: '/404', component: () => import('@/views/404'), hidden: true },
   {
     path: '/',
-    component: () => import('@/views/layout/ApiLayout'),
+    component: () => import('@/views/layout/Layout'),
     children: [
       {
         path: '/',
