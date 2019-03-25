@@ -51,3 +51,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.login-dialog{
+  .el-dialog__body{ padding-bottom: 0; }
+}
+</style>

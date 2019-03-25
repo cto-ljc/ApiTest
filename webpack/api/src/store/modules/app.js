@@ -1,6 +1,6 @@
 const app = {
   state: {
-    user: {}
+    user: ''
   },
   mutations: {
     SET_USER: (state, user) => {
@@ -8,7 +8,7 @@ const app = {
     }
   },
   actions: {
-    setUser({ commit }, { user }) {
+    set_user({ commit }, user) {
       commit('SET_USER', user)
     }
   }

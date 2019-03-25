@@ -32,6 +32,10 @@ export const constantRouterMap = [
     children: [
       {
         path: '/',
+        name: 'default_api',
+        component: () => import('@/views/api/index')
+      }, {
+        path: '/:id',
         name: 'api',
         component: () => import('@/views/api/index')
       }, {
