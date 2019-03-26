@@ -16,32 +16,35 @@
     </div>
     <span class="title">MX-API</span>
     <div v-if="user" class="right">
-      <el-dropdown size="small">
+      <el-dropdown size="small" @command="user_command">
         <el-button type="primary" size="mini">
-          用户账号<i class="el-icon-arrow-down el-icon--right"/>
+          {{ user.email }}<i class="el-icon-arrow-down el-icon--right"/>
         </el-button>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>设置</el-dropdown-item>
-          <el-dropdown-item>退出登录</el-dropdown-item>
+          <el-dropdown-item>修改密码</el-dropdown-item>
+          <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
     <div v-else class="right">
       <el-button-group>
-        <el-button type="primary" size="mini">注册</el-button>
+        <el-button type="primary" size="mini" @click="$refs['reg'].visible = true">注册</el-button>
         <el-button type="primary" size="mini" @click="$refs['login'].visible = true">登陆</el-button>
       </el-button-group>
     </div>
     <login ref="login"/>
+    <Reg ref="reg"/>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Login from '@/components/form/login'
+import Reg from '@/components/form/reg'
 export default {
   components: {
-    Login
+    Login,
+    Reg
   },
   data() {
     return {}
@@ -54,10 +57,34 @@ export default {
   created() {
     // this.$store.commit('set_user', {})
     // this.$store.dispatch('set_user', {})
-    console.log(this.user)
+    // console.log(this.user)
   },
   methods: {
-    handleClick() {}
+    handleClick() {},
+    test() {
+      console.log('123')
+    },
+    user_command(val) {
+      switch (val) {
+        case 'logout':
+          this.logout()
+          break
+      }
+    },
+    // 退出登陆
+    logout() {
+      this.$request.post('/api/index/logout').then(res => {
+        this.$message({
+          message: res.msg,
+          type: 'success'
+        })
+        this.$store.dispatch('set_user', '')
+        this.$store.dispatch('set_project_list', '')
+      }).catch(error => {
+        console.log(error)
+      })
+      console.log('退出登陆')
+    }
   }
 }
 </script>

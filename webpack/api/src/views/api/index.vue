@@ -21,11 +21,11 @@ export default{
   },
   methods: {
     init() {
-      if (this.user && this.user.uid) {
-        console.log('请求接口')
-      } else {
-        console.log('不用请求')
-      }
+      // if (this.user && this.user.uid) {
+      //   console.log('已登录')
+      // } else {
+      //   console.log('未登陆')
+      // }
     },
     submit() {
       console.log(this.api_form)
