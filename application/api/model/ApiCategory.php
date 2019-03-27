@@ -10,7 +10,7 @@ namespace app\api\model;
 use think\Model;
 use think\Db;
 
-class Project extends \app\common\model\BaseModel{
+class ApiCategory extends \app\common\model\BaseModel{
   protected static function init(){    
     //添加前执行事件
     self::beforeInsert(function ($model) { 

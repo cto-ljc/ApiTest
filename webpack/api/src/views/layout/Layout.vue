@@ -1,36 +1,53 @@
 <template>
   <div class="app-wrapper">
     <Header/>
-    <div class="layout_content">
+    <div :class="{'show_sidebar': project_list.length > 0}" class="layout_content">
       <Sidebar/>
       <AppMain/>
     </div>
+    <Category ref="category"/>
+    <Login ref="login"/>
+    <Reg ref="reg"/>
+    <Project ref="project"/>
   </div>
 </template>
 
 <script>
 import { Header, Sidebar, AppMain } from './components'
+import { Category, Login, Reg, Project } from '@/components/form/index'
 import { mapGetters } from 'vuex'
 export default {
-  components: {
-    Header,
-    Sidebar,
-    AppMain
-  },
+  components: { Header, Sidebar, AppMain, Category, Login, Reg, Project },
   data() {
     return {}
   },
   computed: {
     ...mapGetters([
       'user',
-      'project_list'
+      'project_list',
+      'init_layout',
+      'show_category',
+      'show_login',
+      'show_reg',
+      'show_project'
     ])
   },
   watch: {
-    user() {
-      if (this.user !== '' && this.project_list === '') { // 登陆 或者注册情况下 重新请求页面数据
-        this.get_data()
-      }
+    user() {},
+    init_layout() {
+      this.get_data()
+    },
+    show_category() {
+      this.$refs['category'].visible = true
+    },
+    show_login() {
+      this.$refs['login'].visible = true
+    },
+    show_reg() {
+      this.$refs['reg'].visible = true
+    },
+    show_project() {
+      this.$refs['project'].visible = true
     }
   },
   created() {
@@ -59,7 +76,11 @@ export default {
 @import "@/styles/index.scss";
 .layout-header{ position: absolute; top: 0; width: 100%; height: $layoutHeaderHeight; text-align: center;}
 .layout_content{ position: absolute; top: 50px; bottom: 0; width: 100%;
- .layout-sidebar{ position: absolute; top: 0; left: 0; bottom: 0; width: $layoutSidebarWidth; box-shadow: 2px 0px 2px 0px #ccc;}
- .layout-main{ position: absolute; top: 0; right: 0; bottom: 0; left: $layoutSidebarWidth;}
+ .layout-sidebar{ position: absolute; top: 0; left: -$layoutSidebarWidth; bottom: 0; width: $layoutSidebarWidth; box-shadow: 2px 0px 2px 0px #ccc;}
+ .layout-main{ position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
+}
+.layout_content.show_sidebar{
+ .layout-sidebar{ left: 0}
+ .layout-main{left: $layoutSidebarWidth;}
 }
 </style>

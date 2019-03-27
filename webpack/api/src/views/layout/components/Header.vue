@@ -1,18 +1,24 @@
 <template>
   <div :class="user ? 'login' : ''" class="layout-header transition">
     <div v-if="user" class="left">
-      <el-dropdown size="small">
-        <el-button type="primary" size="mini">
-          项目名称<i class="el-icon-arrow-down el-icon--right"/>
+      <div v-if="project_list.length === 0" >
+        <el-button type="primary" size="mini" @click="add_project">
+          添加项目
         </el-button>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>目录</el-dropdown-item>
-          <el-dropdown-item>请求</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-      <el-button type="primary" size="mini">
-        +
-      </el-button>
+      </div>
+      <div v-else>
+        <el-dropdown size="small" @command="project_command">
+          <el-button type="primary" size="mini">
+            {{ project_list[project_index].name }}<i class="el-icon-arrow-down el-icon--right"/>
+          </el-button>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="(project, index) in project_list" :key="index" :command="index">{{ project.name }}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+        <el-button type="primary" size="mini" @click="add_project">
+          +
+        </el-button>
+      </div>
     </div>
     <span class="title">MX-API</span>
     <div v-if="user" class="right">
@@ -28,30 +34,24 @@
     </div>
     <div v-else class="right">
       <el-button-group>
-        <el-button type="primary" size="mini" @click="$refs['reg'].visible = true">注册</el-button>
-        <el-button type="primary" size="mini" @click="$refs['login'].visible = true">登陆</el-button>
+        <el-button type="primary" size="mini" @click="$store.dispatch('show_reg_form')">注册</el-button>
+        <el-button type="primary" size="mini" @click="$store.dispatch('show_login_form')">登陆</el-button>
       </el-button-group>
     </div>
-    <login ref="login"/>
-    <Reg ref="reg"/>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import Login from '@/components/form/login'
-import Reg from '@/components/form/reg'
 export default {
-  components: {
-    Login,
-    Reg
-  },
   data() {
     return {}
   },
   computed: {
     ...mapGetters([
-      'user'
+      'user',
+      'project_list',
+      'project_index'
     ])
   },
   created() {
@@ -61,8 +61,12 @@ export default {
   },
   methods: {
     handleClick() {},
-    test() {
-      console.log('123')
+    // 添加项目
+    add_project() {
+      this.$store.dispatch('show_project_form')
+    },
+    project_command(index) {
+      this.$store.dispatch('set_project_index', index)
     },
     user_command(val) {
       switch (val) {
@@ -92,7 +96,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/styles/index.scss";
 $layout-header-background-color: #1f88f5;
-.login.layout-header{background-color:$layout-header-background-color}
+.login.layout-header{background-color:$layout-header-background-color; user-select:none;}
 .layout-header{ background-color: #409eff; color: white;
   .left,.right{display: inline-block; height:$layoutHeaderHeight; line-height: $layoutHeaderHeight; padding: 0 15px;}
   .left{ float: left; }

@@ -113,3 +113,8 @@ a:hover {
     .del{ background-color: red;}
   }
 }
+
+// 自定义弹出框内表单样式
+.form-dialog{
+  .el-dialog__body{ padding-bottom: 0; }
+}

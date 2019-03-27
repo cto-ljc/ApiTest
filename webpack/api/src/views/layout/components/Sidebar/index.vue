@@ -1,26 +1,30 @@
 <template>
-  <div class="layout-sidebar">
+  <div class="layout-sidebar transition">
     <div class="search-box">
       <el-input v-model="keyword" placeholder="请输入内容" size="mini" class="search">
         <i slot="prefix" class="el-input__icon el-icon-search"/>
       </el-input>
-      <el-dropdown class="add">
+      <el-dropdown class="add" @command="add_command">
         <el-button type="primary" size="mini">
           +
         </el-button>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>目录</el-dropdown-item>
-          <el-dropdown-item>请求</el-dropdown-item>
+          <el-dropdown-item command="category">目录</el-dropdown-item>
+          <el-dropdown-item command="api">请求</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <div class="nav">
+    <div v-if="option.length > 0" class="nav">
       <Item :option="option"/>
+    </div>
+    <div v-else class="nav" style="width:100%; height: 60px;">
+      <div type="text" style="color:#cacaca; width:100%; text-align: center; line-height: 40px; user-select:none;">暂无栏目</div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Item from './item'
 export default {
   components: {
@@ -35,6 +39,13 @@ export default {
       option: []
     }
   },
+  computed: {
+    ...mapGetters([
+      'project',
+      'project_list',
+      'api_list'
+    ])
+  },
   watch: {
     keyword() {
       clearTimeout(this.clock_time)
@@ -44,6 +55,7 @@ export default {
     }
   },
   created() {
+    console.log(this.project)
     this.option = [
       {
         id: 1,
@@ -113,6 +125,17 @@ export default {
     ]
   },
   methods: {
+    add_command(type) {
+      switch (type) {
+        case 'category':
+          this.$store.dispatch('show_category_form')
+          // this.$refs['category'].visible = true
+          break
+        case 'api':
+          // this.$refs['api'].visible = true
+          break
+      }
+    }
   }
 }
 </script>

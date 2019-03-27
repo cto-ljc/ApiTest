@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="reg-dialog" title="用户注册" width="400px">
+  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="form-dialog" title="用户注册" width="400px">
     <el-form ref="reg" :model="form" :rules="rules" label-position="left" label-width="65px">
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="form.email" />
@@ -127,7 +127,7 @@ export default {
               message: res.msg,
               type: 'success'
             })
-            this.$store.dispatch('set_user', res.data.user)
+            this.$store.dispatch('set_init_layout', new Date())
             this.visible = false
           } else {
             this.$message({
@@ -141,9 +141,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.reg-dialog{
-  .el-dialog__body{ padding-bottom: 0; }
-}
-</style>

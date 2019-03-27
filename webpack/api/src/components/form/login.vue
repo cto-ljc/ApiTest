@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="login-dialog" title="用户登录" width="400px" @close="close">
+  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="form-dialog" title="用户登录" width="400px" @close="close">
     <el-form ref="login" :model="form" :rules="rules" label-position="left" label-width="55px">
       <el-form-item label="邮箱" prop="email">
         <el-input v-model="form.email" />
@@ -74,7 +74,7 @@ export default {
             message: res.msg,
             type: 'success'
           })
-          this.$store.dispatch('set_user', res.data.user)
+          this.$store.dispatch('set_init_layout', new Date())
           this.visible = false
         }).catch(error => {
           console.log(error)
@@ -88,9 +88,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-.login-dialog{
-  .el-dialog__body{ padding-bottom: 0; }
-}
-</style>
