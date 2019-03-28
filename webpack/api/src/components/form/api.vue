@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="form-dialog" title="添加请求" width="600px" @close="close">
+  <el-dialog :visible.sync="visible" :close-on-click-modal="false" :title="title" class="form-dialog" width="600px" @close="close">
     <el-form ref="form" :model="form" :rules="rules" label-position="left" label-width="85px">
       <el-form-item label="接口名称" prop="name">
         <el-input v-model="form.name" />
@@ -12,9 +12,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
+      title: '',
       visible: false,
       form: {
         name: ''
@@ -27,11 +29,20 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters([
+      'api_form'
+    ])
+  },
   watch: {
     visible() {
       if (this.visible === false) {
         this.init()
       }
+    },
+    api_form() {
+      this.form = this.api_form
+      this.title = this.form.id ? '编辑接口' : '添加接口'
     }
   },
   methods: {
@@ -40,6 +51,7 @@ export default {
       this.submit_status = false
     },
     submit() {
+      console.log(this.form)
       if (this.submit_status === true) {
         return
       }

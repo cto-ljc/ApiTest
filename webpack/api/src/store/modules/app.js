@@ -55,6 +55,9 @@ const app = {
     },
     DELETE_API_CATEGORY: (state, id) => {
       delete_category_item(state.api_list, id)
+    },
+    APPEND_API: (state, api) => {
+      append_api_item(state.api_list, api)
     }
   },
   actions: {
@@ -82,6 +85,9 @@ const app = {
     },
     delete_api_category({ commit }, id) {
       commit('DELETE_API_CATEGORY', id)
+    },
+    append_api({ commit }, api) {
+      commit('APPEND_API', api)
     }
   }
 }
@@ -164,4 +170,8 @@ function delete_category_item(api_list, id) {
   } catch (e) {
     return
   }
+}
+
+function append_api_item(api_list, api) {
+  console.log(api)
 }

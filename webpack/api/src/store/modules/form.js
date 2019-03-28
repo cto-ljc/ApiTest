@@ -41,7 +41,7 @@ const form = {
       commit('SET_CATEGORY_SHOW', form)
     },
     show_api_form({ commit }, form) {
-      commit('SET_API_SHOW', new Date())
+      commit('SET_API_SHOW', form)
     }
   }
 }

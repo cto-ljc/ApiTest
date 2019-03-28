@@ -4,21 +4,23 @@
       <el-input v-model="keyword" placeholder="请输入内容" size="mini" class="search">
         <i slot="prefix" class="el-input__icon el-icon-search"/>
       </el-input>
-      <el-dropdown class="add" @command="add_command">
+      <el-button type="primary" class="add" size="mini" @click="append_category">
+        +
+      </el-button>
+      <!-- <el-dropdown class="add" @command="add_command">
         <el-button type="primary" size="mini">
           +
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="category">目录</el-dropdown-item>
-          <el-dropdown-item command="api">请求</el-dropdown-item>
         </el-dropdown-menu>
-      </el-dropdown>
+      </el-dropdown> -->
     </div>
     <div v-if="api_list.length > 0" class="nav">
       <Item :option="api_list"/>
     </div>
     <div v-else class="nav" style="width:100%; height: 60px;">
-      <div type="text" style="color:#cacaca; width:100%; text-align: center; line-height: 40px; user-select:none;">暂无栏目</div>
+      <div type="text" class="btn" style="color:#cacaca; width:100%; text-align: center; line-height: 40px; user-select:none;" @click="append_category">暂无栏目  点击<span>添加</span> </div>
     </div>
   </div>
 </template>
@@ -133,14 +135,14 @@ export default {
           }
           this.$store.dispatch('show_category_form', category_form)
           break
-        case 'api':
-          var api_form = {
-            project_id: this.project.id,
-            category_id: 0
-          }
-          this.$store.dispatch('show_api_form', api_form)
-          break
       }
+    },
+    append_category() {
+      var category_form = {
+        project_id: this.project.id,
+        pid: 0
+      }
+      this.$store.dispatch('show_category_form', category_form)
     }
   }
 }

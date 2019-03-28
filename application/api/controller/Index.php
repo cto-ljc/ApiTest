@@ -18,15 +18,16 @@ class Index extends Base{
    */
   public function getMainData(){
     $user = $this -> user; // 登陆用户信息
-    $project_id_array = $user['project_id']; // 用户拥有的项目id
-    $project_id = input('project_id', 0);
-
-    $Project = new \app\api\model\Project();
-    $ApiCategory = new \app\api\model\ApiCategory();
 
     if (!$user) {
       json_success('未登录', []);
     }
+
+    $project_id_array = $user['project_id']; // 用户拥有的项目id
+    $project_id = input('project_id', 0);
+
+    $Project = new \app\api\model\Project();
+    $ApiCategory = new \app\api\model\ApiCategory();    
     
     $project_list = $Project -> where('id','in',$project_id_array) -> select(); // 项目列表
 
