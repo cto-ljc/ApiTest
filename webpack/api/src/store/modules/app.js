@@ -39,8 +39,26 @@ const app = {
       }
     },
     SET_API_LIST: (state, { category, api }) => {
-      category = init_option(category)
-      state.api_list = category
+      let option = []
+      category.forEach(category_item => {
+        const item = []
+        api.forEach(api_item => {
+          if (api_item.category_id === category_item.id) {
+            item.push(api_item)
+          }
+        })
+
+        option.push({
+          id: category_item.id,
+          name: category_item.name,
+          children: [],
+          item,
+          pid: category_item.pid
+        })
+      })
+
+      option = tree_option(option, 0)
+      state.api_list = option
     },
     APPEND_API_CATEGORY: (state, category) => {
       category.children = [] // 为了在添加的时候能够有这个字段 否则会报错
@@ -93,23 +111,6 @@ const app = {
 }
 
 export default app
-
-function init_option(category) {
-  let option = []
-  category.forEach(item => {
-    option.push({
-      id: item.id,
-      name: item.name,
-      children: [],
-      item: [],
-      pid: item.pid
-    })
-  })
-
-  option = tree_option(option, 0)
-
-  return option
-}
 
 function tree_option(option, pid) {
   const list = []
@@ -173,5 +174,18 @@ function delete_category_item(api_list, id) {
 }
 
 function append_api_item(api_list, api) {
-  console.log(api)
+  try {
+    for (var i in api_list) {
+      const item = api_list[i]
+      if (Number(item.id) === Number(api.category_id)) {
+        item.item.push(api)
+        throw new Error('complate')
+      }
+      if (item.children.length > 0) {
+        append_api_item(item.children, api)
+      }
+    }
+  } catch (e) {
+    return
+  }
 }

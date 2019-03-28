@@ -83,7 +83,7 @@ export default {
         const user = res.data.user
         const project_list = res.data.project_list
         const category = res.data.category_list
-        const api = {}
+        const api = res.data.api_list
 
         this.$store.dispatch('set_project_list', project_list)
         this.$store.dispatch('set_user', user)
