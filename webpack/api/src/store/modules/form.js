@@ -1,13 +1,21 @@
 const form = {
   state: {
     show_category: '',
-    show_reg: '',
+    category_form: {}, // 表单字段
+    show_api_form: '',
+    api_form: {}, // 表单字段
+
     show_login: '',
     show_project: ''
   },
   mutations: {
     SET_CATEGORY_SHOW: (state, data) => {
-      state.show_category = data
+      state.show_category = new Date()
+      state.category_form = data
+    },
+    SET_API_SHOW: (state, data) => {
+      state.show_api_form = new Date()
+      state.api_form = data
     },
     SHOW_REG_FORM: (state, data) => {
       state.show_reg = data
@@ -20,9 +28,6 @@ const form = {
     }
   },
   actions: {
-    show_category_form({ commit }) {
-      commit('SET_CATEGORY_SHOW', new Date())
-    },
     show_reg_form({ commit }) {
       commit('SHOW_REG_FORM', new Date())
     },
@@ -31,6 +36,12 @@ const form = {
     },
     show_project_form({ commit }) {
       commit('SHOW_PROJECT_FORM', new Date())
+    },
+    show_category_form({ commit }, form) {
+      commit('SET_CATEGORY_SHOW', form)
+    },
+    show_api_form({ commit }, form) {
+      commit('SET_API_SHOW', new Date())
     }
   }
 }

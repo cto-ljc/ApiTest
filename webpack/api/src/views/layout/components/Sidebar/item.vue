@@ -4,13 +4,15 @@
       <div :style="style" class="folder_name btn" @click="click_folder(folder)"><i :class="folder.show === true ? 'el-icon-arrow-down' : 'el-icon-arrow-up'" style="font-size: 10px;"/>
         {{ folder.name }}
         <div class="add" @click.stop="">
-          <el-dropdown trigger="click" @command="add_command">
-            <el-button type="text" size="mini" style="width:30px;" >
-              +
+          <el-dropdown trigger="click" size="mini" @command="add_command">
+            <el-button type="text" size="mini" title="添加" style="width:30px; color:#000000;" >
+              ···
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="category">目录</el-dropdown-item>
-              <el-dropdown-item command="api">请求</el-dropdown-item>
+              <el-dropdown-item v-if="el<3" :command="{type: 'append_category', folder}">添加子目录</el-dropdown-item>
+              <el-dropdown-item :command="{type: 'append_api', folder}">添加请求</el-dropdown-item>
+              <el-dropdown-item :command="{type: 'rename', folder}">重命名</el-dropdown-item>
+              <el-dropdown-item :command="{type: 'del', folder}">删除</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
@@ -24,6 +26,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'Item',
   props: {
@@ -44,6 +47,11 @@ export default {
       item_style: {}
     }
   },
+  computed: {
+    ...mapGetters([
+      'project'
+    ])
+  },
   created() {
     this.style.padding = '0px 5px 0px ' + (Number(this.el * 10) + Number(10)) + 'px'
     this.item_style.padding = '0px 5px 0px ' + (Number((Number(this.el) + 1) * 10) + Number(10)) + 'px'
@@ -52,8 +60,57 @@ export default {
     click_folder(folder) {
       this.$set(folder, 'show', !folder.show)
     },
-    add_command(type) {
-      console.log(this.option)
+    add_command(command) {
+      const type = command.type
+      const folder = command.folder
+
+      switch (type) {
+        case 'append_category':
+          var category_form = {
+            project_id: this.project.id,
+            pid: folder.id
+          }
+          this.$store.dispatch('show_category_form', category_form)
+          break
+        case 'append_api':
+          var api_form = {
+            project_id: this.project.id,
+            category_id: folder.id
+          }
+          this.$store.dispatch('show_api_form', api_form)
+          break
+        case 'rename':
+          this.$store.dispatch('show_category_form', JSON.parse(JSON.stringify(folder)))
+          break
+        case 'del':
+          this.$confirm('删除此栏目?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            const id_array = this.get_option_id(folder)
+            const data = { id_array }
+            this.$request.post('/api/api_category/batchDelete', data).then(() => {
+              this.$store.dispatch('delete_api_category', folder.id)
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+            }).catch(() => {})
+          }).catch(() => {})
+          break
+      }
+    },
+    // 获取所有子集（包括自己）的id
+    get_option_id(folder) {
+      var id_array = []
+      if (folder.children.length > 0) {
+        folder.children.forEach(item => {
+          id_array = id_array.concat(this.get_option_id(item))
+        })
+      }
+      id_array.push(folder.id)
+      return id_array
     }
   }
 }

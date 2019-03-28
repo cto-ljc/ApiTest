@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="form-dialog" title="添加目录" width="500px" @close="close">
+  <el-dialog :visible.sync="visible" :close-on-click-modal="false" :title="title" class="form-dialog" width="500px" @close="close">
     <el-form ref="form" :model="form" :rules="rules" label-position="left" label-width="85px">
-      <el-form-item label="名称" prop="name">
+      <el-form-item label="目录名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
     </el-form>
@@ -16,23 +16,20 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
+      title: '添加目录',
       visible: false,
-      form: {
-        name: '',
-        project_id: 0,
-        pid: 0
-      },
+      form: {},
       submit_status: false,
       rules: {
         name: [
-          { required: true, message: '请填写项目名称', trigger: 'blur' }
+          { required: true, message: '请填写目录名称', trigger: 'blur' }
         ]
       }
     }
   },
   computed: {
     ...mapGetters([
-      'project'
+      'category_form'
     ])
   },
   watch: {
@@ -40,6 +37,10 @@ export default {
       if (this.visible === false) {
         this.init()
       }
+    },
+    category_form() {
+      this.form = this.category_form
+      this.title = this.form.id ? '编辑目录' : '添加目录'
     }
   },
   created() {
@@ -58,21 +59,22 @@ export default {
           return false
         }
 
-        this.form.project_id = this.project.id
-        console.log(this.form)
+        const url = this.form.id ? '/api/api_category/update' : '/api/api_category/append'
+        const dispatch = this.form.id ? 'update_api_category' : 'append_api_category'
 
-        // this.submit_status = true
-        // this.$request.post('/api/api_category/append', this.form).then(res => {
-        //   this.$message({
-        //     message: res.msg,
-        //     type: 'success'
-        //   })
-        //   this.$store.dispatch('set_init_layout', new Date())
-        //   this.visible = false
-        // }).catch(error => {
-        //   console.log(error)
-        //   this.submit_status = false
-        // })
+        this.submit_status = true
+        this.$request.post(url, this.form).then(res => {
+          this.$message({
+            message: res.msg,
+            type: 'success'
+          })
+          const category = res.data.category
+          this.$store.dispatch(dispatch, category)
+          this.visible = false
+        }).catch(error => {
+          console.log(error)
+          this.submit_status = false
+        })
       })
     },
     close() {

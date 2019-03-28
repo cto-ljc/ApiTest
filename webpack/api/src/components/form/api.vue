@@ -1,7 +1,7 @@
 <template>
   <el-dialog :visible.sync="visible" :close-on-click-modal="false" class="form-dialog" title="添加请求" width="600px" @close="close">
     <el-form ref="form" :model="form" :rules="rules" label-position="left" label-width="85px">
-      <el-form-item label="名称" prop="name">
+      <el-form-item label="接口名称" prop="name">
         <el-input v-model="form.name" />
       </el-form-item>
     </el-form>
@@ -22,7 +22,7 @@ export default {
       submit_status: false,
       rules: {
         name: [
-          { required: true, message: '请填写项目名称', trigger: 'blur' }
+          { required: true, message: '请填写接口名称', trigger: 'blur' }
         ]
       }
     }
@@ -48,13 +48,18 @@ export default {
           return false
         }
 
+        const url = this.form.id ? '/api/api/update' : '/api/api/append'
+        const dispatch = this.form.id ? 'update_api' : 'append_api'
+
         this.submit_status = true
-        this.$request.post('/api/project/append', this.form).then(res => {
+        this.$request.post(url, this.form).then(res => {
           this.$message({
             message: res.msg,
             type: 'success'
           })
-          this.$store.dispatch('set_init_layout', new Date())
+
+          const api = res.data.api
+          this.$store.dispatch(dispatch, api)
           this.visible = false
         }).catch(error => {
           console.log(error)

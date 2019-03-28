@@ -14,8 +14,8 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-    <div v-if="option.length > 0" class="nav">
-      <Item :option="option"/>
+    <div v-if="api_list.length > 0" class="nav">
+      <Item :option="api_list"/>
     </div>
     <div v-else class="nav" style="width:100%; height: 60px;">
       <div type="text" style="color:#cacaca; width:100%; text-align: center; line-height: 40px; user-select:none;">暂无栏目</div>
@@ -55,7 +55,6 @@ export default {
     }
   },
   created() {
-    console.log(this.project)
     this.option = [
       {
         id: 1,
@@ -128,11 +127,18 @@ export default {
     add_command(type) {
       switch (type) {
         case 'category':
-          this.$store.dispatch('show_category_form')
-          // this.$refs['category'].visible = true
+          var category_form = {
+            project_id: this.project.id,
+            pid: 0
+          }
+          this.$store.dispatch('show_category_form', category_form)
           break
         case 'api':
-          // this.$refs['api'].visible = true
+          var api_form = {
+            project_id: this.project.id,
+            category_id: 0
+          }
+          this.$store.dispatch('show_api_form', api_form)
           break
       }
     }

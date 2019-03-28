@@ -9,10 +9,10 @@
       <div v-else>
         <el-dropdown size="small" @command="project_command">
           <el-button type="primary" size="mini">
-            {{ project_list[project_index].name }}<i class="el-icon-arrow-down el-icon--right"/>
+            {{ project.name }}<i class="el-icon-arrow-down el-icon--right"/>
           </el-button>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="(project, index) in project_list" :key="index" :command="index">{{ project.name }}</el-dropdown-item>
+            <el-dropdown-item v-for="(project, index) in project_list" :key="index" :command="project.id">{{ project.name }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
         <el-button type="primary" size="mini" @click="add_project">
@@ -51,7 +51,7 @@ export default {
     ...mapGetters([
       'user',
       'project_list',
-      'project_index'
+      'project'
     ])
   },
   created() {
@@ -66,7 +66,10 @@ export default {
       this.$store.dispatch('show_project_form')
     },
     project_command(index) {
-      this.$store.dispatch('set_project_index', index)
+      const query = JSON.parse(JSON.stringify(this.$route.query))
+      query.project = index
+      this.$router.push({ name: this.$route.name, query })
+      // this.$store.dispatch('set_project_index', index)
     },
     user_command(val) {
       switch (val) {

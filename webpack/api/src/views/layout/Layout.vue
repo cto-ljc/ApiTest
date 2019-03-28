@@ -6,6 +6,7 @@
       <AppMain/>
     </div>
     <Category ref="category"/>
+    <Api ref="api"/>
     <Login ref="login"/>
     <Reg ref="reg"/>
     <Project ref="project"/>
@@ -14,22 +15,25 @@
 
 <script>
 import { Header, Sidebar, AppMain } from './components'
-import { Category, Login, Reg, Project } from '@/components/form/index'
+import { Category, Api, Login, Reg, Project } from '@/components/form/index'
 import { mapGetters } from 'vuex'
 export default {
-  components: { Header, Sidebar, AppMain, Category, Login, Reg, Project },
+  components: { Header, Sidebar, AppMain, Category, Api, Login, Reg, Project },
   data() {
     return {}
   },
   computed: {
     ...mapGetters([
       'user',
+      'project',
       'project_list',
       'init_layout',
       'show_category',
       'show_login',
       'show_reg',
-      'show_project'
+      'show_project',
+      'show_api_form',
+      'api_form'
     ])
   },
   watch: {
@@ -40,6 +44,9 @@ export default {
     show_category() {
       this.$refs['category'].visible = true
     },
+    show_api_form() {
+      this.$refs['api'].visible = true
+    },
     show_login() {
       this.$refs['login'].visible = true
     },
@@ -48,23 +55,39 @@ export default {
     },
     show_project() {
       this.$refs['project'].visible = true
+    },
+    $route() {
+      this.init()
     }
   },
-  created() {
-    this.get_data()
+  mounted() {
+    this.init()
   },
   methods: {
+    init() {
+      if (this.$route.query.project) {
+        this.$store.dispatch('set_project_id', this.$route.query.project)
+      }
+      this.get_data()
+    },
     get_data() {
-      this.$request.post('/api/index/getMainData').then(res => {
+      const project_id = this.$route.query.project
+      const param = {
+        project_id
+      }
+      this.$request.post('/api/index/getMainData', param).then(res => {
         if (!res.data.user) {
           return
         }
 
         const user = res.data.user
         const project_list = res.data.project_list
+        const category = res.data.category_list
+        const api = {}
 
         this.$store.dispatch('set_project_list', project_list)
         this.$store.dispatch('set_user', user)
+        this.$store.dispatch('set_api_list', { category, api })
       }).catch(error => {
         console.log(error)
       })

@@ -18,18 +18,31 @@ class Index extends Base{
    */
   public function getMainData(){
     $user = $this -> user; // 登陆用户信息
+    $project_id_array = $user['project_id']; // 用户拥有的项目id
+    $project_id = input('project_id', 0);
+
+    $Project = new \app\api\model\Project();
+    $ApiCategory = new \app\api\model\ApiCategory();
 
     if (!$user) {
       json_success('未登录', []);
     }
-
-    $project_id_array = $user['project_id']; // 用户拥有的项目id
-
-    $Project = new \app\api\model\Project();
+    
     $project_list = $Project -> where('id','in',$project_id_array) -> select(); // 项目列表
+
+    if (!$project_id && $project_list) { // 若接口没有传项目id 并且项目列表不为空 则取第一个项目的id
+      $project_id = $project_list[0]['id'];
+    }
+
+    if ($project_id) {
+      $category_list = $ApiCategory -> where('project_id',$project_id) -> select(); // api目录列表
+    } else {
+      $category_list = [];
+    }    
 
     $data['user'] = $user;
     $data['project_list'] = $project_list or [];
+    $data['category_list'] = $category_list;
     json_success('页面数据', $data);
   }
 
