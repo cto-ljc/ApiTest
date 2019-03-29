@@ -26,6 +26,7 @@ export default {
     ...mapGetters([
       'user',
       'project',
+      'project_id',
       'project_list',
       'init_layout',
       'show_category',
@@ -56,25 +57,31 @@ export default {
     show_project() {
       this.$refs['project'].visible = true
     },
-    $route() {
+    project_id() {
       this.init()
     }
   },
   mounted() {
-    this.init()
+    const project_id = localStorage.getItem('project_id')
+    if (project_id) { // 根据页面缓存设置当前项目 project_id更改后会在watch调用init函数
+      this.$store.dispatch('set_project_id', project_id)
+    } else {
+      this.init()
+    }
   },
   methods: {
     init() {
-      if (this.$route.query.project) {
-        this.$store.dispatch('set_project_id', this.$route.query.project)
-      }
       this.get_data()
     },
     get_data() {
-      const project_id = this.$route.query.project
+      const project_id = this.project_id
       const param = {
         project_id
       }
+
+      const category = []
+      const api = []
+      this.$store.dispatch('set_api_list', { category, api })
       this.$request.post('/api/index/getMainData', param).then(res => {
         if (!res.data.user) {
           return

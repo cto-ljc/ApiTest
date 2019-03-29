@@ -1,4 +1,3 @@
-// import { list_to_tree } from '@/utils/tool'
 const app = {
   state: {
     init_layout: '', // 用这个字段来监听是否需要刷新
@@ -76,6 +75,12 @@ const app = {
     },
     APPEND_API: (state, api) => {
       append_api_item(state.api_list, api)
+    },
+    UPDATE_API: (state, api) => {
+      update_api_item(state.api_list, api)
+    },
+    DELETE_API: (state, api) => {
+      delete_api_item(state.api_list, api)
     }
   },
   actions: {
@@ -106,6 +111,12 @@ const app = {
     },
     append_api({ commit }, api) {
       commit('APPEND_API', api)
+    },
+    update_api({ commit }, api) {
+      commit('UPDATE_API', api)
+    },
+    delete_api({ commit }, api) {
+      commit('DELETE_API', api)
     }
   }
 }
@@ -183,6 +194,52 @@ function append_api_item(api_list, api) {
       }
       if (item.children.length > 0) {
         append_api_item(item.children, api)
+      }
+    }
+  } catch (e) {
+    return
+  }
+}
+
+// 更新接口
+function update_api_item(api_list, api) {
+  try {
+    for (var i in api_list) {
+      const item = api_list[i]
+      if (Number(item.id) === Number(api.category_id)) {
+        for (var j in item.item) {
+          const item_api = item.item[j]
+          if (item_api.id === api.id) {
+            item.item.splice(j, 1, api)
+            throw new Error('complate')
+          }
+        }
+      }
+      if (item.children.length > 0) {
+        update_api_item(item.children, api)
+      }
+    }
+  } catch (e) {
+    return
+  }
+}
+
+// 删除接口
+function delete_api_item(api_list, api) {
+  try {
+    for (var i in api_list) {
+      const item = api_list[i]
+      if (Number(item.id) === Number(api.category_id)) {
+        for (var j in item.item) {
+          const item_api = item.item[j]
+          if (item_api.id === api.id) {
+            item.item.splice(j, 1)
+            throw new Error('complate')
+          }
+        }
+      }
+      if (item.children.length > 0) {
+        delete_api_item(item.children, api)
       }
     }
   } catch (e) {

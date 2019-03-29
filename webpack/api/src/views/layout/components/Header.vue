@@ -7,7 +7,7 @@
         </el-button>
       </div>
       <div v-else>
-        <el-dropdown size="small" @command="project_command">
+        <el-dropdown size="small" trigger="click" @command="project_command">
           <el-button type="primary" size="mini">
             {{ project.name }}<i class="el-icon-arrow-down el-icon--right"/>
           </el-button>
@@ -65,11 +65,13 @@ export default {
     add_project() {
       this.$store.dispatch('show_project_form')
     },
-    project_command(index) {
+    project_command(project_id) {
       const query = JSON.parse(JSON.stringify(this.$route.query))
-      query.project = index
-      this.$router.push({ name: this.$route.name, query })
-      // this.$store.dispatch('set_project_index', index)
+      query.project = project_id
+      localStorage.setItem('project_id', project_id)
+      // console.log(project_id)
+      // this.$router.push({ name: this.$route.name, query })
+      this.$store.dispatch('set_project_id', project_id)
     },
     user_command(val) {
       switch (val) {

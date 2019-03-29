@@ -28,6 +28,7 @@ class Index extends Base{
 
     $Project = new \app\api\model\Project();
     $ApiCategory = new \app\api\model\ApiCategory();    
+    $Api = new \app\api\model\Api();    
     
     $project_list = $Project -> where('id','in',$project_id_array) -> select(); // 项目列表
 
@@ -37,12 +38,15 @@ class Index extends Base{
 
     if ($project_id) {
       $category_list = $ApiCategory -> where('project_id',$project_id) -> select(); // api目录列表
+      $api_list = $Api -> where('project_id',$project_id) -> select();
     } else {
       $category_list = [];
-    }    
+      $api_list = [];
+    }
 
     $data['user'] = $user;
     $data['project_list'] = $project_list or [];
+    $data['api_list'] = $api_list or [];
     $data['category_list'] = $category_list;
     json_success('页面数据', $data);
   }
