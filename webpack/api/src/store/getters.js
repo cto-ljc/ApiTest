@@ -13,6 +13,8 @@ const getters = {
   api_form: state => state.form.api_form,
   show_reg: state => state.form.show_reg,
   show_login: state => state.form.show_login,
-  show_project: state => state.form.show_project
+  show_project: state => state.form.show_project,
+  api_view_list: state => state.api.list,
+  api_view_id: state => state.api.id
 }
 export default getters

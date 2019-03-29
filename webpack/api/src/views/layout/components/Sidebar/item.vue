@@ -21,18 +21,6 @@
         <Item v-if="folder.children.length > 0" :el="el + 1" :option="folder.children" />
         <div v-for="(item, i) in folder.item" :key="i" :style="item_style" class="item btn" @click="click_api(item)">
           {{ item.name }}
-          <!-- <el-popover
-            v-model="item.visible"
-            placement="top"
-            width="160"
-          >
-            <p>确认删除？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button size="mini" type="text" @click="item.visible = false">取消</el-button>
-              <el-button type="primary" size="mini" @click="item.visible = false">确定</el-button>
-            </div>
-            <el-button slot="reference" class="del btn" size="mini" type="text" icon="el-icon-close" @click.stop=""/>
-          </el-popover> -->
           <div class="dropdown" @click.stop="">
             <el-dropdown trigger="click" size="mini" @command="api_command">
               <el-button class="operation btn" type="text" size="mini" title="操作">
@@ -165,15 +153,15 @@ export default {
     },
     // 点击api列表
     click_api(api) {
-      console.log(api)
+      this.$store.dispatch('append_api_view', JSON.parse(JSON.stringify(api)))
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "@/styles/index.scss";
 $hover_background_color:#f1f1f1;
-$border_color:#ececec;
 .folder{ position: relative;
   .dropdown { position: absolute; top: 1px; width: 28px; height: 30px;  right: 0; opacity: 0;}
   .folder_name:first-child{ }
