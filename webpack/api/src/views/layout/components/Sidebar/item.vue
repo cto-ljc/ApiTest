@@ -130,7 +130,9 @@ export default {
           }).then(() => {
             const data = { id: api.id }
             this.$request.post('/api/api/delete', data).then(() => {
+              console.log(123321123123)
               this.$store.dispatch('delete_api', api)
+              this.$store.dispatch('delete_api_view', api.id)
               this.$message({
                 type: 'success',
                 message: '删除成功!'

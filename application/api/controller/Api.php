@@ -14,7 +14,9 @@ class Api extends Base{
     $id = $Api -> id;
 
     $form_data['id'] = $id;
-    $data['api'] = $form_data;
+
+    $api = $Api -> where('id',$id) -> find();
+    $data['api'] = $api;
 
     json_success('添加成功',$data);
   }

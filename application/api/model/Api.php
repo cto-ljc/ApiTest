@@ -11,6 +11,10 @@ use think\Model;
 use think\Db;
 
 class Api extends \app\common\model\BaseModel{
+  protected $type = [
+    'param' => 'json'
+  ];
+
   protected static function init(){    
     //添加前执行事件
     self::beforeInsert(function ($model) { 
