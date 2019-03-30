@@ -13,7 +13,7 @@
       <Api :id="0"/>
     </section>
     <section v-for="(api,index) in api_view_list" v-show="api.id == api_view_id" :key="index" class="api-view" >
-      <Api :id="api.id"/>
+      <Api :api="api"/>
     </section>
   </div>
 </template>

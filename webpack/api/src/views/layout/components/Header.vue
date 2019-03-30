@@ -20,7 +20,7 @@
         </el-button>
       </div>
     </div>
-    <span class="title">MX-API</span>
+    <span class="title">MX-API-TEST</span>
     <div v-if="user" class="right">
       <el-dropdown size="small" @command="user_command">
         <el-button type="primary" size="mini">
