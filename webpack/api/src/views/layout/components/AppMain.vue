@@ -80,7 +80,7 @@ $tab_height: 40px;
   .tab{ height: 0;
     .tags-view-item{ display: none; }
   }
-  .api-view{ top: 0; position: absolute; width: 100%; bottom: 0;}
+  .api-view{ top: 0; position: absolute; width: 100%; bottom: 0; overflow: auto;}
 }
 .layout-main.show-tab{
   .tab{ height: $tab_height; padding: 4px 10px; line-height: 30px; border-bottom: 1px solid $border_color; box-shadow: 0 1px 5px 0px #ccc; position: absolute; width: 100%; top: 0;
@@ -89,6 +89,6 @@ $tab_height: 40px;
     }
     .tags-view-item.active{ background-color: #409eff; color: white; box-shadow: 0 0 3px 0px #409eff;}
   }
-  .api-view{ top: $tab_height; }
+  .api-view{ top: $tab_height; overflow: auto; }
 }
 </style>

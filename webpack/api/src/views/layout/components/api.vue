@@ -20,7 +20,7 @@
             </el-select>
           </el-input>
           <div class="button-group">
-            <el-button type="primary" size="mini" @click="send2">send</el-button>
+            <el-button type="primary" size="mini" @click="send">send</el-button>
             <el-button type="primary" size="mini" @click="save">保存</el-button>
           </div>
         </div>
@@ -63,12 +63,23 @@
     <el-card v-if="request_status" style="margin-top: 15px;">
       <el-tabs v-model="active_return_view">
         <el-tab-pane v-if="json_data" label="json" name="json">
-          <json-viewer :value="json_data" :expand-depth="5" boxed />
+          <json-viewer :value="json_data" :expand-depth="5" />
         </el-tab-pane>
         <el-tab-pane label="html" name="html">
           <div v-html="html_data"/>
         </el-tab-pane>
-        <el-tab-pane label="source" name="source">角色管理</el-tab-pane>
+        <el-tab-pane label="source" name="source">
+          <pre>{{ html_data }}</pre>
+        </el-tab-pane>
+        <el-tab-pane label="header" name="header">
+          <pre>{{ header_data }}</pre>
+        </el-tab-pane>
+        <el-tab-pane label="img" name="img">
+          <div v-html="img_data"/>
+        </el-tab-pane>
+        <el-tab-pane label="test" name="test">
+          <img :src="html_data">
+        </el-tab-pane>
       </el-tabs>
       <!-- <img :src="return_data"/> -->
     </el-card>
@@ -105,7 +116,9 @@ export default {
       active_return_view: 'html',
       return_data: '',
       json_data: '',
-      html_data: ''
+      html_data: '',
+      header_data: '',
+      img_data: ''
     }
   },
   watch: {
@@ -160,7 +173,7 @@ export default {
       }).catch(() => {})
       console.log(this.api)
     },
-    send() {
+    send_2() {
       const api = this.api
 
       if (api.url === '') {
@@ -176,11 +189,10 @@ export default {
       const request = axios.create()
       request.interceptors.response.use(
         response => {
-          console.log(response)
-          return response
-          // return 'data:image/png;base64,' + btoa(
-          //   new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-          // )
+          console.log(response.data)
+          return 'data:image/png;base64,' + btoa(
+            new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+          )
         },
         error => {
           console.log(error)
@@ -194,41 +206,74 @@ export default {
         data: param,
         responseType: 'arraybuffer'
       }).then(response => {
+        console.log(response)
         this.request_status = true
-        const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
-        this.html_data = data
-        this.json_data = JSON.parse(data)
+        // const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
+        this.html_data = response
+        // this.json_data = JSON.parse(data)
         this.data = response.data
       })
     },
-    send2() {
+    send() {
       const api = this.api
       const url = api.url
-      this.$http.get(url).then(response => {
-        this.active_return_view = 'html'
-        this.request_status = true
-        console.log(response)
-        const data = response.data
-        this.html_data = data
-        if (typeof data === 'object' && data) {
-          this.active_return_view = 'json'
-          this.json_data = data
-        } else {
-          this.json_data = ''
-        }
-      }, response => {
-        this.active_return_view = 'html'
-        this.request_status = true
-        console.log(response)
-        const data = response.data
-        this.html_data = data
-        if (typeof data === 'object' && data) {
-          this.active_return_view = 'json'
-          this.json_data = data
-        } else {
-          this.json_data = ''
+
+      const param = {}
+      api.param.forEach(item => {
+        if (item.key && item.status === true) {
+          param[item.key] = item.value
         }
       })
+
+      this.$http({
+        url,
+        params: param,
+        method: api.type,
+        emulateJSON: false,
+        emulateHTTP: false
+      }).then(response => {
+        this.init_return_data(response)
+      }, response => {
+        this.init_return_data(response)
+      })
+    },
+    init_return_data(response) {
+      this.active_return_view = 'html'
+      this.request_status = true
+      console.log(response)
+      const data = response.data
+
+      // console.log(typeof data)
+
+      this.html_data = data
+      this.header_data = response.headers
+
+      var type = ''
+      try {
+        type = this.header_data.map['content-type'][0].split(';')[0].split('/')[0]
+      } catch (error) {
+        type = ''
+      }
+
+      switch (type) {
+        case 'text':
+          if (typeof data === 'object' && data) {
+            this.active_return_view = 'json'
+            this.json_data = data
+          } else {
+            this.json_data = ''
+          }
+          break
+        case 'image':
+          console.log(btoa(
+            new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+          ))
+          this.img_data = 'data:image/png;base64,' + btoa(
+            new Uint8Array(response.data).reduce((img_data, byte) => img_data + String.fromCharCode(byte), '')
+          )
+          break
+      }
+      console.log(this.img_data)
     },
     is_json(str) {
       if (typeof str === 'string') {

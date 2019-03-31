@@ -167,18 +167,17 @@ $hover_background_color:#f1f1f1;
 .folder{ position: relative;
   .dropdown { position: absolute; top: 1px; width: 28px; height: 30px;  right: 0; opacity: 0;}
   .folder_name:first-child{ }
-  .folder_name{ height: 40px; line-height: 40px; border-bottom: 1px solid $border_color;}
+  .folder_name{ height: 40px; line-height: 40px; border-bottom: 1px solid $border_color; font-size: 14px; }
   .folder_name:hover{ box-shadow: 0px 1px 5px 1px #e8e8e8;
     .dropdown{ opacity: 1; }
   }
   .folder_name:last-child{ border-top: 1px solid red; }
-  .item{ height: 30px; line-height: 30px; position: relative;
+  .item{ height: 30px; line-height: 30px; position: relative; font-size: 14px;
     .dropdown{
       .operation{ color:#000; width: 28px;  }
     }
   }
   .item:last-child{ border-bottom:1px solid $border_color;}
-  // .item:hover{ background-color: $hover_background_color; }
   .item:hover{ box-shadow: 0px 1px 5px 1px #e8e8e8;
     .dropdown{ opacity: 1; }
   }
