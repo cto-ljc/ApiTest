@@ -2,6 +2,7 @@
 namespace app\api\controller;
 
 class Api extends Base{
+  protected $ignore_actions = ['commcurlrequest'];
   /**
    * 添加项目
    */
@@ -49,4 +50,25 @@ class Api extends Base{
 
     json_success('删除成功');
   }
+
+  function commCurlRequest($url='',$postString='',$httpHeader='') {
+    $url = 'http://192.168.1.8/admin/admin/login';
+    $postString = '';
+    $httpHeader = [];
+    $httpHeader['Host'] = 'yunsuma.localhost';
+
+    $ch = curl_init(); 
+    curl_setopt($ch,CURLOPT_URL,$url); 
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$postString); 
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,true); 
+    curl_setopt($ch,CURLOPT_USERAGENT,$_SERVER['HTTP_USER_AGENT']); 
+    if(!empty($httpHeader) && is_array($httpHeader)) {
+      dump($httpHeader);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, $httpHeader); 
+    } 
+    $data = curl_exec($ch); 
+    $info = curl_getinfo($ch); //var_dump($info); 
+    curl_close($ch); 
+    return $data; 
+  } 
 }

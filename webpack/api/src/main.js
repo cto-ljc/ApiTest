@@ -17,9 +17,11 @@ import '@/icons' // icon
 import '@/permission' // permission control
 import request from '@/utils/request'
 import MuseUI from 'muse-ui'
+import VueResource from 'vue-resource'
 
 Vue.use(MuseUI)
 Vue.use(ElementUI, { locale: '' })
+Vue.use(VueResource)
 
 Vue.config.productionTip = false
 Vue.prototype.$request = request

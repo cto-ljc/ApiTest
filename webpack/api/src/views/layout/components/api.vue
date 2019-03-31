@@ -20,7 +20,7 @@
             </el-select>
           </el-input>
           <div class="button-group">
-            <el-button type="primary" size="mini" @click="send">send</el-button>
+            <el-button type="primary" size="mini" @click="send2">send</el-button>
             <el-button type="primary" size="mini" @click="save">保存</el-button>
           </div>
         </div>
@@ -62,7 +62,7 @@
     </el-card>
     <el-card v-if="request_status" style="margin-top: 15px;">
       <el-tabs v-model="active_return_view">
-        <el-tab-pane label="json" name="json">
+        <el-tab-pane v-if="json_data" label="json" name="json">
           <json-viewer :value="json_data" :expand-depth="5" boxed />
         </el-tab-pane>
         <el-tab-pane label="html" name="html">
@@ -102,7 +102,7 @@ export default {
     return {
       api_rename_status: false,
       request_status: false,
-      active_return_view: 'json',
+      active_return_view: 'html',
       return_data: '',
       json_data: '',
       html_data: ''
@@ -176,6 +176,7 @@ export default {
       const request = axios.create()
       request.interceptors.response.use(
         response => {
+          console.log(response)
           return response
           // return 'data:image/png;base64,' + btoa(
           //   new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
@@ -188,7 +189,7 @@ export default {
 
       this.request_status = false
       request({
-        method: api.type,
+        method: 'get',
         url: api.url,
         data: param,
         responseType: 'arraybuffer'
@@ -199,6 +200,49 @@ export default {
         this.json_data = JSON.parse(data)
         this.data = response.data
       })
+    },
+    send2() {
+      const api = this.api
+      const url = api.url
+      this.$http.get(url).then(response => {
+        this.active_return_view = 'html'
+        this.request_status = true
+        console.log(response)
+        const data = response.data
+        this.html_data = data
+        if (typeof data === 'object' && data) {
+          this.active_return_view = 'json'
+          this.json_data = data
+        } else {
+          this.json_data = ''
+        }
+      }, response => {
+        this.active_return_view = 'html'
+        this.request_status = true
+        console.log(response)
+        const data = response.data
+        this.html_data = data
+        if (typeof data === 'object' && data) {
+          this.active_return_view = 'json'
+          this.json_data = data
+        } else {
+          this.json_data = ''
+        }
+      })
+    },
+    is_json(str) {
+      if (typeof str === 'string') {
+        try {
+          var obj = JSON.parse(str)
+          if (typeof obj === 'object' && obj) {
+            return true
+          } else {
+            return false
+          }
+        } catch (e) {
+          return false
+        }
+      }
     }
   }
 }

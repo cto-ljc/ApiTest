@@ -84,7 +84,7 @@ $tab_height: 40px;
 }
 .layout-main.show-tab{
   .tab{ height: $tab_height; padding: 4px 10px; line-height: 30px; border-bottom: 1px solid $border_color; box-shadow: 0 1px 5px 0px #ccc; position: absolute; width: 100%; top: 0;
-    .tags-view-item{display: inline-block; margin: 0 3px; box-shadow: 0 0 3px 0px #ccc; box-sizing: border-box; height: 24px; line-height: 24px; padding: 0 10px; color: #696969;
+    .tags-view-item{display: inline-block; margin: 0 3px; box-shadow: 0 0 3px 0px #ccc; box-sizing: border-box; height: 24px; line-height: 24px; padding: 0 10px; color: #696969; font-size: 12px;
       .delete:hover{ background-color: #ff5858; border-radius:10px; color: white;}
     }
     .tags-view-item.active{ background-color: #409eff; color: white; box-shadow: 0 0 3px 0px #409eff;}
