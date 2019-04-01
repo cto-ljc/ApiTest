@@ -192,47 +192,56 @@ export default {
           return response
         },
         error => {
-          console.log(error)
+          return error
         }
       )
 
       this.request_status = false
       request({
-        method: 'get',
+        method: api.type,
         url: api.url,
         data: param,
+        validateStatus: status => {
+          return true // 状态码在大于或等于500时才会 reject
+        },
         responseType: 'arraybuffer'
+        // headers: {'X-Requested-With': 'XMLHttpRequest'}
+        // withCredentials: true
       }).then(response => {
         console.log(response)
-        this.request_status = true
-        const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
+        return
+        // this.request_status = true
+        // const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
 
-        this.header_data = response.headers
+        // this.header_data = response.headers
+        // console.log(response)
 
-        var type = ''
-        try {
-          type = this.header_data['content-type'].split(';')[0].split('/')[0]
-        } catch (error) {
-          type = ''
-        }
+        // var type = ''
+        // try {
+        //   type = this.header_data['content-type'].split(';')[0].split('/')[0]
+        // } catch (error) {
+        //   type = ''
+        // }
 
-        console.log(type)
+        // console.log(type)
 
-        switch (type) {
-          case 'text':
-            if (this.is_json(data)) {
-              this.active_return_view = 'json'
-              this.json_data = JSON.parse(data)
-            }
-            this.html_data = data
-            break
-          case 'image':
-            this.active_return_view = 'image'
-            this.img_data = 'data:image/png;base64,' + btoa(
-              new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-            )
-            break
-        }
+        // switch (type) {
+        //   case 'text':
+        //     if (this.is_json(data)) {
+        //       this.active_return_view = 'json'
+        //       this.json_data = JSON.parse(data)
+        //     }
+        //     this.html_data = data
+        //     break
+        //   case 'image':
+        //     this.active_return_view = 'image'
+        //     this.img_data = 'data:image/png;base64,' + btoa(
+        //       new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+        //     )
+        //     break
+        // }
+      }).catch(error => {
+        console.log(error)
       })
     },
     send() {
