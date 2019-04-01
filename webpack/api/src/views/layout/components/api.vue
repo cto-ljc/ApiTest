@@ -20,7 +20,7 @@
             </el-select>
           </el-input>
           <div class="button-group">
-            <el-button type="primary" size="mini" @click="send">send</el-button>
+            <el-button type="primary" size="mini" @click="send_2">send</el-button>
             <el-button type="primary" size="mini" @click="save">保存</el-button>
           </div>
         </div>
@@ -65,20 +65,20 @@
         <el-tab-pane v-if="json_data" label="json" name="json">
           <json-viewer :value="json_data" :expand-depth="5" />
         </el-tab-pane>
-        <el-tab-pane label="html" name="html">
+        <el-tab-pane v-if="html_data" label="html" name="html">
           <div v-html="html_data"/>
         </el-tab-pane>
-        <el-tab-pane label="source" name="source">
+        <el-tab-pane v-if="html_data" label="source" name="source">
           <pre>{{ html_data }}</pre>
+        </el-tab-pane>
+        <el-tab-pane v-if="img_data" label="image" name="image">
+          <img :src="img_data">
         </el-tab-pane>
         <el-tab-pane label="header" name="header">
           <pre>{{ header_data }}</pre>
         </el-tab-pane>
-        <el-tab-pane label="img" name="img">
+        <el-tab-pane v-if="img_data" label="img_test" name="test">
           <div v-html="img_data"/>
-        </el-tab-pane>
-        <el-tab-pane label="test" name="test">
-          <img :src="html_data">
         </el-tab-pane>
       </el-tabs>
       <!-- <img :src="return_data"/> -->
@@ -189,10 +189,7 @@ export default {
       const request = axios.create()
       request.interceptors.response.use(
         response => {
-          console.log(response.data)
-          return 'data:image/png;base64,' + btoa(
-            new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-          )
+          return response
         },
         error => {
           console.log(error)
@@ -208,10 +205,34 @@ export default {
       }).then(response => {
         console.log(response)
         this.request_status = true
-        // const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
-        this.html_data = response
-        // this.json_data = JSON.parse(data)
-        this.data = response.data
+        const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
+
+        this.header_data = response.headers
+
+        var type = ''
+        try {
+          type = this.header_data['content-type'].split(';')[0].split('/')[0]
+        } catch (error) {
+          type = ''
+        }
+
+        console.log(type)
+
+        switch (type) {
+          case 'text':
+            if (this.is_json(data)) {
+              this.active_return_view = 'json'
+              this.json_data = JSON.parse(data)
+            }
+            this.html_data = data
+            break
+          case 'image':
+            this.active_return_view = 'image'
+            this.img_data = 'data:image/png;base64,' + btoa(
+              new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
+            )
+            break
+        }
       })
     },
     send() {
@@ -265,9 +286,6 @@ export default {
           }
           break
         case 'image':
-          console.log(btoa(
-            new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
-          ))
           this.img_data = 'data:image/png;base64,' + btoa(
             new Uint8Array(response.data).reduce((img_data, byte) => img_data + String.fromCharCode(byte), '')
           )
