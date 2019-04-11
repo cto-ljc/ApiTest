@@ -20,44 +20,78 @@
             </el-select>
           </el-input>
           <div class="button-group">
-            <el-button type="primary" size="mini" @click="send_2">send</el-button>
+            <el-button type="primary" size="mini" @click="axios_send">send</el-button>
             <el-button type="primary" size="mini" @click="save">保存</el-button>
           </div>
         </div>
       </div>
       <div>
-        请求参数：
-        <el-table
-          ref="api.param"
-          :data="api.param"
-          class="table"
-          tooltip-effect="dark"
-          style="width: 100%"
-          @selection-change="handleSelectionChange">
-          <el-table-column label="" width="30">
-            <template slot-scope="scope">
-              <el-checkbox v-model="scope.row.status"/>
-            </template>
-          </el-table-column>
-          <el-table-column prop="key" label="key">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.key" :class="{'disabled': scope.row.status !== true}" placeholder="key" size="mini" @change="write_key($event, scope.$index)"/>
-            </template>
-          </el-table-column>
-          <el-table-column prop="value" label="value">
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.value" :class="{'disabled': scope.row.status !== true}" placeholder="value" size="mini"/>
-            </template>
-          </el-table-column>
-          <el-table-column prop="description" label="备注">
-            <template slot-scope="scope">
-              <div class="description">
-                <el-input v-model="scope.row.description" :class="{'disabled': scope.row.status !== true}" placeholder="备注" size="mini"/>
-                <el-button v-if="scope.$index < (api.param.length - 1)" class="delete" type="text" icon="el-icon-close" @click="delete_param(scope.$index)"/>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
+        <el-tabs v-model="request_option_tab">
+          <el-tab-pane label="params" name="param">
+            <el-table
+              ref="api.param"
+              :data="api.param"
+              class="table"
+              tooltip-effect="dark"
+              style="width: 100%">
+              <el-table-column label="" width="30">
+                <template slot-scope="scope">
+                  <el-checkbox v-model="scope.row.status"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="key" label="key">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.key" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.param.length - 1)}" placeholder="key" size="mini" @change="write_key($event, scope.$index)"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="value" label="value">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.value" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.param.length - 1)}" placeholder="value" size="mini"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="description" label="备注">
+                <template slot-scope="scope">
+                  <div class="description">
+                    <el-input v-model="scope.row.description" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.param.length - 1)}" placeholder="备注" size="mini"/>
+                    <el-button v-if="scope.$index < (api.param.length - 1)" class="delete" type="text" icon="el-icon-close" @click="delete_param(scope.$index)"/>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+          <el-tab-pane label="headers" name="header">
+            <el-table
+              ref="api.header"
+              :data="api.header"
+              class="table"
+              tooltip-effect="dark"
+              style="width: 100%">
+              <el-table-column label="" width="30">
+                <template slot-scope="scope">
+                  <el-checkbox v-model="scope.row.status"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="key" label="key">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.key" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.header.length - 1)}" placeholder="key" size="mini" @change="write_header($event, scope.$index)"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="value" label="value">
+                <template slot-scope="scope">
+                  <el-input v-model="scope.row.value" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.header.length - 1)}" placeholder="value" size="mini"/>
+                </template>
+              </el-table-column>
+              <el-table-column prop="description" label="备注">
+                <template slot-scope="scope">
+                  <div class="description">
+                    <el-input v-model="scope.row.description" :class="{'disabled': scope.row.status !== true && scope.$index !== (api.header.length - 1)}" placeholder="备注" size="mini"/>
+                    <el-button v-if="scope.$index < (api.header.length - 1)" class="delete" type="text" icon="el-icon-close" @click="delete_header(scope.$index)"/>
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+        </el-tabs>
       </div>
     </el-card>
     <el-card v-if="request_status" style="margin-top: 15px;">
@@ -103,6 +137,7 @@ export default {
           name: 'untitled request',
           type: 'get',
           param: [],
+          header: [],
           url: ''
         }
       },
@@ -113,6 +148,7 @@ export default {
     return {
       api_rename_status: false,
       request_status: false,
+      request_option_tab: 'param',
       active_return_view: 'html',
       return_data: '',
       json_data: '',
@@ -132,11 +168,13 @@ export default {
   },
   created() {
     this.api.param = this.api.param ? this.api.param : []
+    this.api.header = this.api.header ? this.api.header : []
     this.init()
   },
   methods: {
     init() {
       this.push_api_param()
+      this.push_api_header()
     },
     api_rename() {
       this.api_rename_status = false
@@ -150,16 +188,30 @@ export default {
       }
       this.api.param.push(empty_param)
     },
+    push_api_header() {
+      const empty_header = {
+        key: '',
+        value: '',
+        description: ''
+      }
+      this.api.header.push(empty_header)
+    },
     delete_param(index) {
       this.api.param.splice(index, 1)
-    },
-    handleSelectionChange(val) {
-      console.log(val)
     },
     write_key(value, index) {
       if (index === (this.api.param.length - 1)) {
         this.api.param[index].status = true
         this.push_api_param()
+      }
+    },
+    delete_header(index) {
+      this.api.header.splice(index, 1)
+    },
+    write_header(value, index) {
+      if (index === (this.api.header.length - 1)) {
+        this.api.header[index].status = true
+        this.push_api_header()
       }
     },
     save() {
@@ -173,7 +225,7 @@ export default {
       }).catch(() => {})
       console.log(this.api)
     },
-    send_2() {
+    axios_send() {
       const api = this.api
 
       if (api.url === '') {
@@ -197,25 +249,6 @@ export default {
       )
 
       this.request_status = false
-      // return new Promise((resolve, reject) => {
-      //   request({
-      //     method: api.type,
-      //     url: api.url,
-      //     data: param,
-      //     validateStatus: status => {
-      //       return true // 状态码在大于或等于500时才会 reject
-      //     },
-      //     responseType: 'arraybuffer'
-      //     // headers: {'X-Requested-With': 'XMLHttpRequest'}
-      //     // withCredentials: true
-      //   }).then(response => {
-      //     console.log(response)
-      //     resolve(response)
-      //   }).catch(error => {
-      //     console.log(error)
-      //     handleError(error)
-      //   })
-      // })
 
       // return
       request({
@@ -225,9 +258,9 @@ export default {
         validateStatus: status => {
           return true // 状态码在大于或等于500时才会 reject
         },
-        responseType: 'arraybuffer',
+        responseType: 'arraybuffer'
         // headers: { 'Authorization': 'sasdasasd' }
-        withCredentials: true
+        // withCredentials: true
       }).then(response => {
         console.log(response)
         // return
@@ -242,8 +275,6 @@ export default {
         } catch (error) {
           type = ''
         }
-
-        // console.log(type)
 
         switch (type) {
           case 'text':
@@ -264,7 +295,7 @@ export default {
         console.log(error)
       })
     },
-    send() {
+    vue_send() {
       const api = this.api
       const url = api.url
 
