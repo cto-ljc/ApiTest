@@ -12,7 +12,8 @@ use think\Db;
 
 class Api extends \app\common\model\BaseModel{
   protected $type = [
-    'param' => 'json'
+    'param' => 'json',
+    'header' => 'json',
   ];
 
   protected static function init(){    

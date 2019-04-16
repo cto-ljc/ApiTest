@@ -15,9 +15,11 @@
             <el-dropdown-item v-for="(project, index) in project_list" :key="index" :command="project.id">{{ project.name }}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
-        <el-button type="primary" size="mini" @click="add_project">
-          +
-        </el-button>
+        <el-button-group>
+          <el-button type="primary" size="mini" icon="el-icon-plus" @click="add_project"/>
+          <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit_project"/>
+          <el-button type="primary" size="mini" icon="el-icon-close" @click="delete_project"/>
+        </el-button-group>
       </div>
     </div>
     <span class="title">MX-API-TEST</span>
@@ -65,6 +67,10 @@ export default {
     add_project() {
       this.$store.dispatch('show_project_form')
     },
+    edit_project() {
+      this.$store.dispatch('show_project_form', this.project)
+    },
+    delete_project() {},
     project_command(project_id) {
       const query = JSON.parse(JSON.stringify(this.$route.query))
       query.project = project_id
@@ -98,6 +104,10 @@ export default {
 }
 </script>
 
+<style type="text/css">
+.el-button-group .el-button--primary:not(:first-child):not(:last-child){ border-left-color: rgba(255, 255, 255, 0.2); }
+.el-button-group .el-button--primary:last-child{ border-left-color: rgba(255, 255, 255, 0.2);}
+</style>
 <style lang="scss" scoped>
 @import "@/styles/index.scss";
 $layout-header-background-color: #1f88f5;

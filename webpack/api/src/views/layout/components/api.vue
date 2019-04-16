@@ -108,11 +108,14 @@
         <el-tab-pane v-if="img_data" label="image" name="image">
           <img :src="img_data">
         </el-tab-pane>
-        <el-tab-pane label="header" name="header">
+        <el-tab-pane v-if="header_data" label="header" name="header">
           <pre>{{ header_data }}</pre>
         </el-tab-pane>
         <el-tab-pane v-if="img_data" label="img_test" name="test">
           <div v-html="img_data"/>
+        </el-tab-pane>
+        <el-tab-pane v-if="error_data" label="error_data" name="test">
+          <div v-html="JSON.stringify(error_data)"/>
         </el-tab-pane>
       </el-tabs>
       <!-- <img :src="return_data"/> -->
@@ -154,7 +157,8 @@ export default {
       json_data: '',
       html_data: '',
       header_data: '',
-      img_data: ''
+      img_data: '',
+      error_data: ''
     }
   },
   watch: {
@@ -218,6 +222,7 @@ export default {
       const data = JSON.parse(JSON.stringify(this.api))
 
       data.param.splice(data.param.length - 1, 1)
+      data.header.splice(data.header.length - 1, 1)
 
       this.$request.post('/api/api/update', data).then((res) => {
         this.$store.dispatch('update_api', data)
@@ -233,8 +238,15 @@ export default {
       }
       const param = {}
       api.param.forEach(item => {
-        if (item.key) {
+        if (item.key && item.status) {
           param[item.key] = item.value
+        }
+      })
+
+      const header = {}
+      api.header.forEach(item => {
+        if (item.key && item.status) {
+          header[item.key] = item.value
         }
       })
 
@@ -258,12 +270,10 @@ export default {
         validateStatus: status => {
           return true // 状态码在大于或等于500时才会 reject
         },
-        responseType: 'arraybuffer'
-        // headers: { 'Authorization': 'sasdasasd' }
+        responseType: 'arraybuffer',
+        headers: header
         // withCredentials: true
       }).then(response => {
-        console.log(response)
-        // return
         this.request_status = true
         const data = String.fromCharCode.apply(null, new Uint8Array(response.data))
 
@@ -278,6 +288,10 @@ export default {
 
         switch (type) {
           case 'text':
+            this.$message({
+              message: '请求成功',
+              type: 'success'
+            })
             if (this.is_json(data)) {
               this.active_return_view = 'json'
               this.json_data = JSON.parse(data)
@@ -285,14 +299,25 @@ export default {
             this.html_data = data
             break
           case 'image':
+            this.$message({
+              message: '请求成功',
+              type: 'success'
+            })
             this.active_return_view = 'image'
             this.img_data = 'data:image/png;base64,' + btoa(
               new Uint8Array(response.data).reduce((data, byte) => data + String.fromCharCode(byte), '')
             )
             break
+          default:
+            this.$message({
+              message: '接口错误',
+              type: 'error'
+            })
+            this.html_data = response
+            // this.json_data = response
+            break
         }
-      }).catch(error => {
-        console.log(error)
+      }).catch(() => {
       })
     },
     vue_send() {

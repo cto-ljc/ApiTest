@@ -23,8 +23,8 @@ const form = {
     SHOW_LOGIN_FORM: (state, data) => {
       state.show_login = data
     },
-    SHOW_PROJECT_FORM: (state, data) => {
-      state.show_project = data
+    SHOW_PROJECT_FORM: (state, form) => {
+      state.show_project = new Date()
     }
   },
   actions: {
@@ -34,8 +34,8 @@ const form = {
     show_login_form({ commit }) {
       commit('SHOW_LOGIN_FORM', new Date())
     },
-    show_project_form({ commit }) {
-      commit('SHOW_PROJECT_FORM', new Date())
+    show_project_form({ commit }, form) {
+      commit('SHOW_PROJECT_FORM', form)
     },
     show_category_form({ commit }, form) {
       commit('SET_CATEGORY_SHOW', form)
